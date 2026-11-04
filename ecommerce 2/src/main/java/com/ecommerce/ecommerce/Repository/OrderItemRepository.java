@@ -1,0 +1,4 @@
+package com.ecommerce.ecommerce.Repository;
+
+public interface OrderItemRepository {
+}
