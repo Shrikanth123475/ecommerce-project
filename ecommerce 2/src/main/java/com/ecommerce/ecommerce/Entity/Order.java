@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name="cart_items")
+@Table(name="orders")
 @Getter
 @Setter
 @NoArgsConstructor
