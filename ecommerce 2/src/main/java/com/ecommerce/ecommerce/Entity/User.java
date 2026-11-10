@@ -27,4 +27,10 @@ public class User {
 
     private String address;
 
+    @OneToOne(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Cart cart;
+
+
 }

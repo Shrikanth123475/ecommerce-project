@@ -49,16 +49,26 @@ public class CartServiceImpl implements CartService {
                           Long productId,
                           Integer quantity){
 
+        System.out.println("UserId: " + userId);
+        System.out.println("ProductId: " + productId);
+        System.out.println("Quantity: " + quantity);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
+        System.out.println("User found");
 
         Cart cart=cartRepository.findByUser(user)
                 .orElseThrow(()->
                         new RuntimeException("Cart not found"));
+
+        System.out.println("Cart found");
+
         Product product =productRepository.findById(productId)
                 .orElseThrow(()->
                         new RuntimeException("product not found"));
+        System.out.println("Product found");
+
 
         CartItem cartItem = new CartItem();
 
