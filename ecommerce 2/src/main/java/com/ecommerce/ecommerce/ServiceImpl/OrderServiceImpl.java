@@ -20,6 +20,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(OrderDTO orderDTO) {
 
         Order order = Order.builder()
+                .totalAmount(orderDTO.getTotalAmount())
+                .status(orderDTO.getStatus())
                 .build();
 
         order = orderRepository.save(order);
@@ -53,6 +55,8 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderDTO.builder()
                 .id(order.getId())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
                 .build();
     }
 }

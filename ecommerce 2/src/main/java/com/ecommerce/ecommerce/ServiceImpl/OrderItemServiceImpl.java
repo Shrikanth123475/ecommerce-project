@@ -37,7 +37,33 @@ public class OrderItemServiceImpl implements OrderItemService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+    @Override
+    public OrderItemDTO getOrderItemById(Long id) {
 
+        OrderItem orderItem = orderItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order Item Not Found"));
+
+        return mapToDTO(orderItem);
+    }
+    @Override
+    public OrderItemDTO updateOrderItem(Long id,
+                                        OrderItemDTO orderItemDTO) {
+
+        OrderItem orderItem = orderItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order Item Not Found"));
+
+        orderItem.setQuantity(orderItemDTO.getQuantity());
+        orderItem.setPrice(orderItemDTO.getPrice());
+
+        orderItem = orderItemRepository.save(orderItem);
+
+        return mapToDTO(orderItem);
+    }
+    @Override
+    public void deleteOrderItem(Long id) {
+
+        orderItemRepository.deleteById(id);
+    }
     private OrderItemDTO mapToDTO(OrderItem orderItem) {
 
         return OrderItemDTO.builder()
