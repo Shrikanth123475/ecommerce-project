@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerce.Controller;
 
 import com.ecommerce.ecommerce.DTO.UserDTO;
+import com.ecommerce.ecommerce.DTO.LoginDTO;
 import com.ecommerce.ecommerce.Entity.User;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +28,7 @@ public class UserController {
     }
   @PostMapping("/login")
     public User login(@RequestBody LoginDTO loginDTO){
-      return userService.login(
-              loginDTO.getEmail(),
-              loginDTO.getPassword()
-      );
+      return userService.login( loginDTO);
 
   }
   @DeleteMapping("/{id}")
