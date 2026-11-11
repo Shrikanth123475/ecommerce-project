@@ -61,6 +61,38 @@ public class CartItemServiceImpl implements CartItemService {
 
         return cartItemRepository.save(cartItem);
     }
+    @Override
+    public CartItem incrementQuantity(Long cartItemId){
+
+        CartItem cartItem =
+                cartItemRepository.findById(cartItemId)
+                        .orElseThrow(() ->
+                                new RuntimeException("Cart Item not found"));
+
+        return updateQuantity(
+                cartItemId,
+                cartItem.getQuantity() + 1
+        );
+    }
+
+    @Override
+    public CartItem decrementQuantity(Long cartItemId){
+
+        CartItem cartItem =
+                cartItemRepository.findById(cartItemId)
+                        .orElseThrow(() ->
+                                new RuntimeException("Cart Item not found"));
+
+        if(cartItem.getQuantity() == 1){
+            cartItemRepository.delete(cartItem);
+            return null;
+        }
+
+        return updateQuantity(
+                cartItemId,
+                cartItem.getQuantity() - 1
+        );
+    }
 
 }
 

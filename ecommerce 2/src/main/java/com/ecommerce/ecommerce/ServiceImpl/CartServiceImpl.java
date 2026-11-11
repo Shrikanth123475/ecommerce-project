@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import com.ecommerce.ecommerce.DTO.CartItemResponseDTO;
+import com.ecommerce.ecommerce.DTO.CartResponseDTO;
 import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.CartItem;
 import com.ecommerce.ecommerce.Entity.Product;
@@ -10,6 +12,8 @@ import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.CartService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -33,14 +37,31 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart getCartByUserId(Long userId){
+    public CartResponseDTO getCartByUserId(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-        return cartRepository.findByUser(user)
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(()->
                         new RuntimeException("Cart not found "));
+
+        List<CartItemResponseDTO> items=cart.getCartItems()
+                .stream()
+                .map(cartItem -> new CartItemResponseDTO(
+                        cartItem.getProduct().getId(),
+                        cartItem.getProduct().getName(),
+                        cartItem.getProduct().getDescription(),
+                        cartItem.getProduct().getPrice(),
+                        cartItem.getQuantity()
+
+                ))
+                .toList();
+        return new CartResponseDTO(
+                cart.getId(),
+                userId,
+                items
+        );
 
     }
 

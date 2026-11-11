@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.Controller;
 
+import com.ecommerce.ecommerce.Entity.CartItem;
 import com.ecommerce.ecommerce.Service.CartItemService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,5 +23,17 @@ public class CartItemController {
         cartItemService.removeCartItem(cartItemId);
 
         return "Cart Item Removed Successfully";
+    }
+    @PutMapping("/{cartItemId}/increment")
+    public CartItem incrementQuantity(
+            @PathVariable Long cartItemId){
+
+        return cartItemService.incrementQuantity(cartItemId);
+    }
+    @PutMapping("/{cartItemId}/decrement")
+    public CartItem decrementQuantity(
+            @PathVariable Long cartItemId){
+
+        return cartItemService.decrementQuantity(cartItemId);
     }
 }

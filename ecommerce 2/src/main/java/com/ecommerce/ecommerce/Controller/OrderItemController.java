@@ -21,6 +21,7 @@ public class OrderItemController {
 
     @GetMapping
     public List<OrderItemDTO> getAllOrderItems() {
+
         return orderItemService.getAllOrderItems();
     }
 }

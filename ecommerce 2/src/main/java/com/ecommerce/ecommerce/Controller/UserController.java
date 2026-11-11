@@ -2,6 +2,7 @@ package com.ecommerce.ecommerce.Controller;
 
 import com.ecommerce.ecommerce.DTO.UserDTO;
 import com.ecommerce.ecommerce.DTO.LoginDTO;
+import com.ecommerce.ecommerce.DTO.UserResponseDTO;
 import com.ecommerce.ecommerce.Entity.User;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +17,12 @@ public class UserController {
   }
 
   @PostMapping("/register")
-    public User register(@RequestBody UserDTO userDTO){
+    public UserResponseDTO register(@RequestBody UserDTO userDTO){
       return userService.register(userDTO);
   }
   @PostMapping("/login")
-    public User login(@RequestBody LoginDTO loginDTO){
+    public UserResponseDTO login(@RequestBody LoginDTO loginDTO){
+
       return userService.login( loginDTO);
 
   }

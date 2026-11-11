@@ -2,6 +2,7 @@ package com.ecommerce.ecommerce.ServiceImpl;
 
 import com.ecommerce.ecommerce.DTO.LoginDTO;
 import com.ecommerce.ecommerce.DTO.UserDTO;
+import com.ecommerce.ecommerce.DTO.UserResponseDTO;
 import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.User;
 import com.ecommerce.ecommerce.Repository.CartRepository;
@@ -26,7 +27,7 @@ public UserServiceImpl (
 }
 
 @Override
-    public User register(UserDTO userDTO){
+    public UserResponseDTO register(UserDTO userDTO){
     if(userRepository.existsByEmail(userDTO.getEmail())){
         throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
@@ -46,10 +47,15 @@ public UserServiceImpl (
     cart.setUser(savedUser);
     savedUser.setCart(cart);
     cartRepository.save(cart);
-    return savedUser;
+    return new UserResponseDTO(
+            savedUser.getId(),
+            savedUser.getName(),
+            savedUser.getEmail(),
+            savedUser.getAddress()
+    );
 }
 @Override
-    public User login (LoginDTO loginDTO){
+    public UserResponseDTO login (LoginDTO loginDTO){
 
     System.out.println("Login request received");
     System.out.println("Email: " + loginDTO.getEmail());
@@ -66,7 +72,12 @@ public UserServiceImpl (
     }
 
 
-    return user;
+    return new UserResponseDTO(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getAddress()
+    );
 
 
 

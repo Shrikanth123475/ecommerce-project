@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerce.Controller;
 
 import com.ecommerce.ecommerce.DTO.CartDTO;
+import com.ecommerce.ecommerce.DTO.CartResponseDTO;
 import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Service.CartService;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,9 @@ public class CartController {
     }
 
     @GetMapping("/{userId}")
-    public Cart getCart(@PathVariable Long userId) {
+    public CartResponseDTO getCart(@PathVariable Long userId) {
+
+        System.out.println("Getting cart for user " + userId);
 
         return cartService.getCartByUserId(userId);
     }

@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductDTO mapToDTO(Product product) {
         return ProductDTO.builder()
-                .id(product.getId())
+//                .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
