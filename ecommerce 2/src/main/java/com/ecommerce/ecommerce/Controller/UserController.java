@@ -16,14 +16,24 @@ public class UserController {
       this.userService=userService;
   }
 
+prashant-branch
   @PostMapping("/register")
     public UserResponseDTO register(@RequestBody UserDTO userDTO){
       return userService.register(userDTO);
   }
-  @PostMapping("/login")
-    public UserResponseDTO login(@RequestBody LoginDTO loginDTO){
 
-      return userService.login( loginDTO);
+    @PostMapping("/register")
+    public User register(@RequestBody UserDTO userDTO){
+
+        User user = User.builder()
+                .name(userDTO.getName())
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .build();
+
+        return userService.register(user);
+    }
+
 
   }
   @DeleteMapping("/{id}")

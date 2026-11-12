@@ -9,4 +9,10 @@ public interface OrderItemService {
     OrderItemDTO createOrderItem(OrderItemDTO orderItemDTO);
 
     List<OrderItemDTO> getAllOrderItems();
+
+    OrderItemDTO getOrderItemById(Long id);
+
+    OrderItemDTO updateOrderItem(Long id, OrderItemDTO orderItemDTO);
+
+    void deleteOrderItem(Long id);
 }

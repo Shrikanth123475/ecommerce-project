@@ -33,8 +33,10 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() ->
                         new RuntimeException(" User not found"));
 
-        System.out.println("User found");
-//        System.out.println("Cart Items Count = " + cart.getCartItems().size());
+        Order order = Order.builder()
+                .totalAmount(orderDTO.getTotalAmount())
+                .status(orderDTO.getStatus())
+                .build();
 
 
         Cart cart = cartRepository.findByUser(user)
@@ -172,9 +174,11 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
 
-        order.setStatus("CANCELLED");
-
-        orderRepository.save(order);
+        return OrderDTO.builder()
+                .id(order.getId())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .build();
     }
 
 

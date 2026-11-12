@@ -6,16 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
-@RequestMapping("/api/order-items")
+@RequestMapping("/api/orderitems")
 @RequiredArgsConstructor
 public class OrderItemController {
 
     private final OrderItemService orderItemService;
 
     @PostMapping
-    public OrderItemDTO createOrderItem(@RequestBody OrderItemDTO orderItemDTO) {
+    public OrderItemDTO createOrderItem(
+            @RequestBody OrderItemDTO orderItemDTO) {
+
         return orderItemService.createOrderItem(orderItemDTO);
     }
 
@@ -23,5 +24,28 @@ public class OrderItemController {
     public List<OrderItemDTO> getAllOrderItems() {
 
         return orderItemService.getAllOrderItems();
+    }
+
+    @GetMapping("/{id}")
+    public OrderItemDTO getOrderItemById(
+            @PathVariable Long id) {
+
+        return orderItemService.getOrderItemById(id);
+    }
+
+    @PutMapping("/{id}")
+    public OrderItemDTO updateOrderItem(
+            @PathVariable Long id,
+            @RequestBody OrderItemDTO orderItemDTO) {
+
+        return orderItemService.updateOrderItem(id, orderItemDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteOrderItem(
+            @PathVariable Long id) {
+
+        orderItemService.deleteOrderItem(id);
+        return "Order Item Deleted Successfully";
     }
 }
