@@ -4,6 +4,8 @@ package com.ecommerce.ecommerce.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,7 +21,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double totalAmount;
+    private BigDecimal totalAmount;
     private String status;
 
     @ManyToOne
@@ -28,6 +30,8 @@ public class Order {
 
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
+
+    private LocalDateTime orderDate;
 
 
 

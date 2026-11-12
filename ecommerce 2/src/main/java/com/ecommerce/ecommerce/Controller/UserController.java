@@ -2,6 +2,7 @@ package com.ecommerce.ecommerce.Controller;
 
 import com.ecommerce.ecommerce.DTO.UserDTO;
 import com.ecommerce.ecommerce.DTO.LoginDTO;
+import com.ecommerce.ecommerce.DTO.UserResponseDTO;
 import com.ecommerce.ecommerce.Entity.User;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,12 @@ public class UserController {
       this.userService=userService;
   }
 
+prashant-branch
+  @PostMapping("/register")
+    public UserResponseDTO register(@RequestBody UserDTO userDTO){
+      return userService.register(userDTO);
+  }
+
     @PostMapping("/register")
     public User register(@RequestBody UserDTO userDTO){
 
@@ -26,9 +33,7 @@ public class UserController {
 
         return userService.register(user);
     }
-  @PostMapping("/login")
-    public User login(@RequestBody LoginDTO loginDTO){
-      return userService.login( loginDTO);
+
 
   }
   @DeleteMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerce.Entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +31,7 @@ public class User {
     @OneToOne(mappedBy = "user",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @JsonManagedReference
     private Cart cart;
 
 

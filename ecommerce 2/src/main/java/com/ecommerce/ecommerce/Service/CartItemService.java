@@ -13,4 +13,9 @@ public interface CartItemService {
     CartItem updateQuantity(Long cartItemId, Integer quantity);
 
     void removeCartItem(Long cartItemId);
+
+    CartItem incrementQuantity(Long cartItemId);
+
+    CartItem decrementQuantity(Long cartItemId);
+
 }
