@@ -37,8 +37,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponseDTO getCartByUserId(Long userId){
-        User user = userRepository.findById(userId)
+    public CartResponseDTO getCartByUserId(String email){
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
@@ -59,7 +59,7 @@ public class CartServiceImpl implements CartService {
                 .toList();
         return new CartResponseDTO(
                 cart.getId(),
-                userId,
+                email,
                 items
         );
 

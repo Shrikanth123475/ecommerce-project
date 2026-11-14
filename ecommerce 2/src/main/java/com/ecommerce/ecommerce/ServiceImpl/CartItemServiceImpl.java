@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.CartItem;
 import com.ecommerce.ecommerce.Repository.CartItemRepository;
 import com.ecommerce.ecommerce.Repository.CartRepository;
+import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.ecommerce.ecommerce.Service.CartItemService;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.List;
 public class CartItemServiceImpl implements CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
+//    private final ProductRepository productRepository;
 
     public CartItemServiceImpl(
             CartItemRepository cartItemRepository,
@@ -57,7 +59,8 @@ public class CartItemServiceImpl implements CartItemService {
                         .orElseThrow(() ->
                                 new RuntimeException("Cart Item not found"));
 
-        cartItem.setQuantity(quantity);
+//        cartItem.setQuantity(quantity);
+//        cartItem.getProduct().setQuantity(cartItem.getProduct().getQuantity() - quantity);
 
         return cartItemRepository.save(cartItem);
     }
