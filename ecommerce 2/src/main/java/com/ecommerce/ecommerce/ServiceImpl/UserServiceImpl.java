@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import com.ecommerce.ecommerce.DTO.AuthResponseDTO;
 import com.ecommerce.ecommerce.DTO.LoginDTO;
 import com.ecommerce.ecommerce.DTO.UserDTO;
 import com.ecommerce.ecommerce.DTO.UserResponseDTO;
@@ -7,6 +8,7 @@ import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.User;
 import com.ecommerce.ecommerce.Repository.CartRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
+import com.ecommerce.ecommerce.Service.JwtService;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserServiceImpl implements UserService {
 private final UserRepository userRepository;
 private final CartRepository cartRepository;
+private final JwtService jwtService;
 
 public UserServiceImpl (
         UserRepository userRepository,
-        CartRepository cartRepository
+        CartRepository cartRepository,
+        JwtService jwtService
 ){
     this.userRepository=userRepository;
     this.cartRepository=cartRepository;
+    this.jwtService=jwtService;
 
 }
 
@@ -55,29 +60,27 @@ public UserServiceImpl (
     );
 }
 @Override
-    public UserResponseDTO login (LoginDTO loginDTO){
+    public AuthResponseDTO login (LoginDTO loginDTO){
 
     System.out.println("Login request received");
     System.out.println("Email: " + loginDTO.getEmail());
 
     User user=userRepository.findByEmail(loginDTO.getEmail())
-            .orElseThrow(() -> {
+            .orElseThrow(() -> (
 
-                return new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User not found");
-            });
+                 new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User not found")
+            ));
 
 
     if(!user.getPassword(). equals(loginDTO.getPassword())){
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid Password");
     }
-
-
-    return new UserResponseDTO(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            user.getAddress()
+    String token = jwtService.generateToken(
+            user.getEmail()
     );
+
+
+    return new AuthResponseDTO(token);
 
 
 
