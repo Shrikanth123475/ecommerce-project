@@ -19,10 +19,17 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public String addToCart(@RequestBody CartDTO cartDTO) {
+    public String addToCart(@RequestBody CartDTO cartDTO,Principal principal) {
+
+
+        System.out.println("Controller ProductId = "
+                + cartDTO.getProductId());
+
+        System.out.println("Controller Quantity = "
+                + cartDTO.getQuantity());
 
         cartService.addToCart(
-                cartDTO.getUserId(),
+                principal.getName(),
                 cartDTO.getProductId(),
                 cartDTO.getQuantity()
         );
@@ -33,9 +40,9 @@ public class CartController {
     @GetMapping()
     public CartResponseDTO getCart(Principal principal) {
          String email = principal.getName();
-        System.out.println(" email in cart getmapping  is  " + email);
+        System.out.println(" email in cart get mapping  is  " + email);
 
-        return cartService.getCartByUserId(email);
+        return cartService.getCartByEmail(email);
     }
 
     @DeleteMapping("/{cartItemId}")

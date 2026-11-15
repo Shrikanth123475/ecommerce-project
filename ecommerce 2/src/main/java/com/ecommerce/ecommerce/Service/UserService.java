@@ -10,5 +10,5 @@ public interface UserService {
 
   UserResponseDTO register (UserDTO userDTO);
   AuthResponseDTO login (LoginDTO loginDTO);
-  void deleteUser(Long id);
+  void deleteUserByEmail(String email);
 }

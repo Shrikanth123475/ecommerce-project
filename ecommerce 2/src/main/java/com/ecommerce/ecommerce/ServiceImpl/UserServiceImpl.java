@@ -87,17 +87,16 @@ public UserServiceImpl (
 }
 
 @Override
-    public void deleteUser(Long id){
+    public void deleteUserByEmail(String email){
 
-    System.out.println("Deleting user: " + id);
+    System.out.println("Deleting user: " + email);
 
-    if(!userRepository.existsById(id)){
-        throw new RuntimeException("User not found");
-    }
+User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->new RuntimeException("User not found"));
     System.out.println("User exists");
 
 
-    userRepository.deleteById(id);
+    userRepository.delete(user);
 }
 
 

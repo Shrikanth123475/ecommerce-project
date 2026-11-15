@@ -6,6 +6,7 @@ import com.ecommerce.ecommerce.DTO.UserDTO;
 import com.ecommerce.ecommerce.DTO.UserResponseDTO;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/users")
@@ -21,14 +22,21 @@ public class UserController {
         return userService.register(userDTO);
     }
 
+
     @PostMapping("/login")
     public AuthResponseDTO login(@RequestBody LoginDTO loginDTO) {
         return userService.login(loginDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return "User deleted successfully";
-    }
+
+
+  @DeleteMapping("/delete")
+    public String deleteUser(Authentication authentication){
+      String email = authentication.getName();
+      userService.deleteUserByEmail(email);
+      return "User deleted successfully";
+  }
+
+
+
 }

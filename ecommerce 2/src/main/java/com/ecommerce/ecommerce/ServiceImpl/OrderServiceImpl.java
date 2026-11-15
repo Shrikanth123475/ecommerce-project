@@ -10,7 +10,9 @@ import com.ecommerce.ecommerce.Repository.OrderRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,16 +29,13 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public OrderResponseDTO placeOrder(Long userId) {
-        System.out.println("UserId = " + userId);
-        User user = userRepository.findById(userId)
+    public OrderResponseDTO placeOrder(String email) {
+        System.out.println("Email = " + email);
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new RuntimeException(" User not found"));
 
-        Order order = Order.builder()
-                .totalAmount(orderDTO.getTotalAmount())
-                .status(orderDTO.getStatus())
-                .build();
+
 
 
         Cart cart = cartRepository.findByUser(user)
@@ -83,6 +82,13 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         cartItemRepository.deleteAll(cart.getCartItems());
+//        cartItemRepository.flush();
+//        System.out.println(
+//                "Cart Items in DB = " + cartItemRepository.count()
+//        );
+        cart.getCartItems().clear();
+
+        cartRepository.save(cart);
 
         List<OrderItemResponseDTO> items =
                 savedOrder.getOrderItems()
@@ -97,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
                         .toList();
         return new OrderResponseDTO(
                 savedOrder.getId(),
-                userId,
+                email,
                 totalAmount,
                 savedOrder.getStatus(),
                 items
@@ -106,11 +112,17 @@ public class OrderServiceImpl implements OrderService {
 
     }
     @Override
-    public OrderResponseDTO getOrderById(Long orderId) {
+    public OrderResponseDTO getOrderById(Long orderId,String email) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
+        if (!order.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot access another user's order"
+            );
+        }
 
         List<OrderItemResponseDTO> items = order.getOrderItems()
                 .stream()
@@ -125,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
 
         return new OrderResponseDTO(
                 order.getId(),
-                order.getUser().getId(),
+                order.getUser().getEmail(),
                 order.getTotalAmount(),
                 order.getStatus(),
                 items
@@ -133,9 +145,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponseDTO> getOrdersByUser(Long userId) {
+    public List<OrderResponseDTO> getOrdersByUser(String email) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
@@ -158,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
 
                     return new OrderResponseDTO(
                             order.getId(),
-                            userId,
+                            email,
                             order.getTotalAmount(),
                             order.getStatus(),
                             items
@@ -168,17 +180,27 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancelOrder(Long orderId) {
+    public void cancelOrder(Long orderId,String email) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
 
-        return OrderDTO.builder()
-                .id(order.getId())
-                .totalAmount(order.getTotalAmount())
-                .status(order.getStatus())
-                .build();
+
+        String ownerEmail =
+                order.getUser().getEmail();
+
+        if (!ownerEmail.equals(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot cancel another user's order"
+            );
+        }
+
+        order.setStatus("CANCELLED");
+
+        orderRepository.save(order);
+
     }
 
 

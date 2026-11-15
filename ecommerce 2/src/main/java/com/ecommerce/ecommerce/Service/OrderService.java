@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface OrderService {
 
-  OrderResponseDTO placeOrder(Long userId);
-    OrderResponseDTO getOrderById(Long orderId);
-    List<OrderResponseDTO> getOrdersByUser(Long userId);
-    void cancelOrder(Long orderId);
+  OrderResponseDTO placeOrder(String email);
+    OrderResponseDTO getOrderById(Long orderId,String email);
+    List<OrderResponseDTO> getOrdersByUser(String email);
+    void cancelOrder(Long orderId,String email);
 
 }
