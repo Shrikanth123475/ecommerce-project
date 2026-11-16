@@ -18,11 +18,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
+
         Product product = Product.builder()
                 .name(productDTO.getName())
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
                 .quantity(productDTO.getQuantity())
+                .imageUrl(productDTO.getImageUrl())
+                .category(productDTO.getCategory())
+                .brand(productDTO.getBrand())
                 .build();
 
         product = productRepository.save(product);
@@ -32,36 +36,37 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> getAllProducts() {
+
         return productRepository.findAll()
                 .stream()
-                .map(product -> new ProductDTO(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getQuantity()
-                ))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ProductDTO getProductById(Long id) {
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found"));
 
         return mapToDTO(product);
     }
 
     @Override
-    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
+    public ProductDTO updateProduct(
+            Long id,
+            ProductDTO productDTO) {
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found"));
 
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setQuantity(productDTO.getQuantity());
+        product.setImageUrl(productDTO.getImageUrl());
 
         product = productRepository.save(product);
 
@@ -72,14 +77,26 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
+    @Override
+    public List<String> getAllCategories() {
+        return productRepository.findAllCategories();
+    }
 
+    @Override
+    public List<String> getAllBrands() {
+        return productRepository.findAllBrands();
+    }
     private ProductDTO mapToDTO(Product product) {
+
         return ProductDTO.builder()
-//                .id(product.getId())
+                .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
+                .imageUrl(product.getImageUrl())
+                .category(product.getCategory())
+                .brand(product.getBrand())
                 .build();
     }
 }

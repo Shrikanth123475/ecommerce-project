@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import ProductCard from "../components/ProductCard";
+import ProductFilters from "../components/ProductFilters";
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -33,16 +34,27 @@ function Products() {
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
+          gap: "20px",
+          padding: "20px",
         }}
       >
-        {products.map((product, index) => (
-          <ProductCard
-            key={index}
-            product={product}
-          />
-        ))}
+        <ProductFilters />
+
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {products.map((product, index) => (
+            <ProductCard
+              key={index}
+              product={product}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

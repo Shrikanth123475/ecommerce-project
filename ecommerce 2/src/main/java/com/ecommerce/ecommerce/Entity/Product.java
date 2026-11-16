@@ -22,6 +22,7 @@ public class Product {
     private String description;
     private BigDecimal price;
     private Integer quantity;
-    //image url if needed
-
+    private String imageUrl;
+    private String category;
+    private String brand;
 }
