@@ -4,6 +4,7 @@ package com.ecommerce.ecommerce.Entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name="users")
@@ -33,6 +34,12 @@ public class User {
             orphanRemoval = true)
     @JsonManagedReference
     private Cart cart;
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Order> orders;
 
 
 }

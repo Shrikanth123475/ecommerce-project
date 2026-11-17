@@ -98,9 +98,17 @@ public class CartServiceImpl implements CartService {
 
         if (existingCartItem != null) {
 
-            existingCartItem.setQuantity(
-                    existingCartItem.getQuantity() + quantity
-            );
+            int newQuantity =
+                    existingCartItem.getQuantity() + quantity;
+
+            if (newQuantity > product.getQuantity()) {
+                throw new RuntimeException(
+                        "Only " + product.getQuantity()
+                                + " items available in stock"
+                );
+            }
+
+            existingCartItem.setQuantity(newQuantity);
 
             cartItemRepository.save(existingCartItem);
             return;
@@ -114,6 +122,13 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(quantity);
 
         cartItemRepository.save(cartItem);
+
+        if (quantity > product.getQuantity()) {
+            throw new RuntimeException(
+                    "Only " + product.getQuantity()
+                            + " items available in stock"
+            );
+        }
     }
 
 

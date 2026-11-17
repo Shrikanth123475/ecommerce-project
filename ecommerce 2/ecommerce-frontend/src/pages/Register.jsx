@@ -128,6 +128,7 @@ export default function Register({
             onChange={handleChange}
             required
             style={inputStyle}
+
           />
 
           <input
@@ -172,6 +173,7 @@ export default function Register({
               fontWeight: "bold",
               cursor: "pointer",
               fontSize: "16px",
+
             }}
           >
             {loading
@@ -221,6 +223,7 @@ export default function Register({
               color: "#2563EB",
               fontWeight: "bold",
               cursor: "pointer",
+
             }}
           >
             Login
@@ -236,4 +239,6 @@ const inputStyle = {
   borderRadius: "10px",
   border: "1px solid #CBD5E1",
   fontSize: "16px",
+  backgroundColor:"white",
+  color: "#000000",
 };

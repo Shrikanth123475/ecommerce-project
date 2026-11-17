@@ -71,31 +71,55 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new RuntimeException(
+                                        "Cart Item not found"));
+
+        int productStock =
+                cartItem.getProduct().getQuantity();
+
+        if (quantity > productStock) {
+            throw new RuntimeException(
+                    "Only " + productStock +
+                            " item(s) available in stock"
+            );
+        }
 
         cartItem.setQuantity(quantity);
-//        cartItem.getProduct().setQuantity(cartItem.getProduct().getQuantity() - quantity);
 
         return cartItemRepository.save(cartItem);
     }
+
+
     @Override
-    public CartItem incrementQuantity(Long cartItemId,String email){
+    public CartItem incrementQuantity(
+            Long cartItemId,
+            String email) {
 
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new RuntimeException(
+                                        "Cart Item not found"));
 
-        String ownerEmail = cartItem.getCart()
-                .getUser()
-                .getEmail();
-        System.out.println("JWT Email = " + email);
-        System.out.println("Owner Email = " + ownerEmail);
+        String ownerEmail =
+                cartItem.getCart()
+                        .getUser()
+                        .getEmail();
 
         if (!ownerEmail.equals(email)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "You cannot modify another user's cart item"
+            );
+        }
+
+        int availableStock =
+                cartItem.getProduct().getQuantity();
+
+        if (cartItem.getQuantity() >= availableStock) {
+            throw new RuntimeException(
+                    "Only " + availableStock +
+                            " item(s) available in stock"
             );
         }
 
@@ -104,18 +128,21 @@ public class CartItemServiceImpl implements CartItemService {
                 cartItem.getQuantity() + 1
         );
     }
-
     @Override
-    public CartItem decrementQuantity(Long cartItemId,String email){
+    public CartItem decrementQuantity(
+            Long cartItemId,
+            String email) {
 
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new RuntimeException(
+                                        "Cart Item not found"));
 
-        String ownerEmail = cartItem.getCart()
-                .getUser()
-                .getEmail();
+        String ownerEmail =
+                cartItem.getCart()
+                        .getUser()
+                        .getEmail();
 
         if (!ownerEmail.equals(email)) {
             throw new ResponseStatusException(
@@ -124,8 +151,7 @@ public class CartItemServiceImpl implements CartItemService {
             );
         }
 
-
-        if(cartItem.getQuantity() == 1){
+        if (cartItem.getQuantity() == 1) {
             cartItemRepository.delete(cartItem);
             return null;
         }

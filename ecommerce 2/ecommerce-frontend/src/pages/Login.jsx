@@ -128,6 +128,8 @@ export default function Login({
               borderRadius: "10px",
               border: "1px solid #CBD5E1",
               fontSize: "16px",
+              backgroundColor:"white",
+              color: "#000000",
             }}
           />
 
@@ -143,6 +145,8 @@ export default function Login({
               borderRadius: "10px",
               border: "1px solid #CBD5E1",
               fontSize: "16px",
+              backgroundColor:"white",
+             color: "#000000"
             }}
           />
 

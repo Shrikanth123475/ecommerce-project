@@ -27,7 +27,24 @@ public class UserController {
     public AuthResponseDTO login(@RequestBody LoginDTO loginDTO) {
         return userService.login(loginDTO);
     }
+    @GetMapping("/profile")
+    public UserResponseDTO getProfile(
+            Authentication authentication
+    ) {
 
+        String email = authentication.getName();
+
+        return userService.getProfile(email);
+    }
+    @PutMapping("/profile")
+    public UserResponseDTO updateProfile(
+            Authentication authentication,
+            @RequestBody UserDTO userDTO) {
+
+        String email = authentication.getName();
+
+        return userService.updateProfile(email, userDTO);
+    }
 
 
   @DeleteMapping("/delete")

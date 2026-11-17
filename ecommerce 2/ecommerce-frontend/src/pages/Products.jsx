@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import ProductCard from "../components/ProductCard";
 
-function Products() {
+function Products({ searchTerm, filter }) {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -13,6 +13,21 @@ function Products() {
       })
       .catch((err) => console.error(err));
   }, []);
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesFilter =
+      filter === "all"
+        ? true
+        : filter === "available"
+        ? product.quantity > 0
+        : product.quantity === 0;
+
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <div>
@@ -37,12 +52,23 @@ function Products() {
           justifyContent: "center",
         }}
       >
-        {products.map((product, index) => (
-          <ProductCard
-            key={index}
-            product={product}
-          />
-        ))}
+        {filteredProducts.length === 0 ? (
+          <h2
+            style={{
+              color: "#64748B",
+              marginTop: "40px",
+            }}
+          >
+            No products found
+          </h2>
+        ) : (
+          filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+            />
+          ))
+        )}
       </div>
     </div>
   );

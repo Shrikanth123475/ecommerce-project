@@ -58,18 +58,27 @@ style={{
 
    <button
      onClick={addToCart}
+     disabled={product.quantity === 0}
      style={{
-       backgroundColor: "#3B82F6",
+       backgroundColor:
+         product.quantity === 0
+           ? "#9CA3AF"
+           : "#3B82F6",
        color: "white",
        border: "none",
        padding: "10px 20px",
        borderRadius: "8px",
-       cursor: "pointer",
+       cursor:
+         product.quantity === 0
+           ? "not-allowed"
+           : "pointer",
        marginTop: "10px",
        fontWeight: "bold"
      }}
    >
-     Add To Cart
+     {product.quantity === 0
+       ? "Out Of Stock"
+       : "Add To Cart"}
    </button>
     </div>
   );

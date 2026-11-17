@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.ecommerce.ecommerce.Repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public OrderResponseDTO placeOrder(String email) {
@@ -56,13 +58,30 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CartItem cartItem : cart.getCartItems()) {
+
+            Product product = cartItem.getProduct();
+
+            if (cartItem.getQuantity() > product.getQuantity()) {
+                throw new RuntimeException(
+                        product.getName()
+                                + " does not have enough stock"
+                );
+            }
+
+            product.setQuantity(
+                    product.getQuantity()
+                            - cartItem.getQuantity()
+            );
+
+            productRepository.save(product);
+
             OrderItem orderItem = new OrderItem();
+
             orderItem.setOrder(order);
-            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setProduct(product);
             orderItem.setQuantity(cartItem.getQuantity());
-            BigDecimal price =
-                    cartItem.getProduct()
-                            .getPrice();
+
+            BigDecimal price = product.getPrice();
 
             orderItem.setPrice(price);
 
@@ -151,7 +170,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-        List<Order> orders = orderRepository.findByUser(user);
+        List<Order> orders =
+                orderRepository.findByUserOrderByIdDesc(user);
 
         return orders.stream()
                 .map(order -> {
@@ -180,28 +200,66 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancelOrder(Long orderId,String email) {
+    public OrderResponseDTO cancelOrder(
+            Long orderId,
+            String email
+    ) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
 
-
-        String ownerEmail =
-                order.getUser().getEmail();
-
-        if (!ownerEmail.equals(email)) {
+        if (!order.getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "You cannot cancel another user's order"
             );
         }
 
+        if ("CANCELLED".equals(order.getStatus())) {
+            throw new RuntimeException(
+                    "Order already cancelled"
+            );
+        }
+
+        for (OrderItem orderItem : order.getOrderItems()) {
+
+            Product product = orderItem.getProduct();
+
+            product.setQuantity(
+                    product.getQuantity()
+                            + orderItem.getQuantity()
+            );
+
+            productRepository.save(product);
+
+
+
+        }
+
         order.setStatus("CANCELLED");
 
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
+        List<OrderItemResponseDTO> items =
+                savedOrder.getOrderItems()
+                        .stream()
+                        .map(item -> new OrderItemResponseDTO(
+                                item.getProduct().getId(),
+                                item.getProduct().getName(),
+                                item.getProduct().getDescription(),
+                                item.getPrice(),
+                                item.getQuantity()
+                        ))
+                        .toList();
+
+        return new OrderResponseDTO(
+                savedOrder.getId(),
+                savedOrder.getUser().getEmail(),
+                savedOrder.getTotalAmount(),
+                savedOrder.getStatus(),
+                items
+        );
     }
-
 
 }

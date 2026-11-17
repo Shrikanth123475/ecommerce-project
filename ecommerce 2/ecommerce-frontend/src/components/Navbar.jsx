@@ -1,4 +1,10 @@
-function Navbar({ setPage }) {
+function Navbar({
+    setPage,
+       searchTerm,
+       setSearchTerm,
+       filter,
+       setFilter,
+       }) {
 
   const email = localStorage.getItem("email");
 
@@ -13,7 +19,7 @@ function Navbar({ setPage }) {
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: "#2563EB",
-        padding: "15px 30px",
+        padding: "20px 35px",
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
       }}
     >
@@ -22,12 +28,63 @@ function Navbar({ setPage }) {
         style={{
           color: "white",
           margin: 0,
-          fontSize: "36px",
+          fontSize: "42px",
           fontWeight: "bold",
         }}
       >
         🛒 ShopEase
       </h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="🔍 Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            width: "350px",
+            padding: "12px 18px",
+            borderRadius: "25px",
+            border: "1px solid #CBD5E1",
+            backgroundColor: "#FFFFFF",
+            color: "#000000",
+            outline: "none",
+            fontSize: "15px",
+          }}
+        />
+
+        <select
+          value={filter}
+          onChange={(e) =>
+            setFilter(e.target.value)
+          }
+          style={{
+            padding: "12px",
+            borderRadius: "10px",
+            border: "none",
+            color: "black",
+            cursor: "pointer",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <option value="all">
+            All Products
+          </option>
+
+          <option value="available">
+            Available
+          </option>
+
+          <option value="outofstock">
+            Out Of Stock
+          </option>
+        </select>
+      </div>
 
       {/* Navigation */}
       <div
@@ -36,26 +93,19 @@ function Navbar({ setPage }) {
           gap: "15px",
         }}
       >
-        <button
-          onClick={() => setPage("products")}
-          style={buttonStyle}
-        >
-          Products
-        </button>
+       <button onClick={() => setPage("products")}
+           style={buttonStyle}
+           >
+         Products
+       </button>
 
-        <button
-          onClick={() => setPage("cart")}
-          style={buttonStyle}
-        >
-          Cart
-        </button>
+       <button onClick={() => setPage("orders")}
+           style={buttonStyle}
+           >
+         Orders
+       </button>
 
-        <button
-          onClick={() => setPage("orders")}
-          style={buttonStyle}
-        >
-          Orders
-        </button>
+
       </div>
 
       {/* Profile + Logout */}
@@ -67,24 +117,63 @@ function Navbar({ setPage }) {
         }}
       >
         <div
-          onClick={() => setPage("profile")}
-          title="Profile"
+          onClick={() => setPage("cart")}
+          title="Cart"
           style={{
-            width: "42px",
-            height: "42px",
+            width: "50px",
+            height: "50px",
             borderRadius: "50%",
             backgroundColor: "white",
             color: "#2563EB",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontWeight: "bold",
-            fontSize: "18px",
+            fontSize: "35px",
             cursor: "pointer",
             boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
           }}
         >
-          {initial}
+          🛍️
+        </div>
+
+        <div
+          onClick={() => setPage("profile")}
+          title="Profile"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            cursor: "pointer",
+            fontSize: "35px",
+          }}
+        >
+          <div
+            style={{
+              width: "50px",
+              height: "50px",
+              borderRadius: "50%",
+              backgroundColor: "white",
+              color: "#2563EB",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "bold",
+              fontSize: "20px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            }}
+          >
+            {initial}
+          </div>
+
+          <span
+            style={{
+              color: "white",
+              fontSize: "45px",
+              fontWeight: "bold",
+            }}
+          >
+            ▾
+          </span>
         </div>
 
         <button
@@ -110,11 +199,11 @@ const buttonStyle = {
   backgroundColor: "white",
   color: "#2563EB",
   border: "none",
-  borderRadius: "10px",
-  padding: "10px 20px",
+  borderRadius: "12px",
+  padding: "12px 24px",
   cursor: "pointer",
   fontWeight: "bold",
-  fontSize: "15px",
+  fontSize: "17px",
 };
 
 export default Navbar;

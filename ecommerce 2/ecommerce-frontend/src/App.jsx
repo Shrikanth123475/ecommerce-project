@@ -5,11 +5,13 @@ import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Orders from "./pages/OrdersPage";
 import Navbar from "./components/Navbar";
-import profile from "./pages/Profile";
+import Profile from "./pages/Profile";
 
 function App() {
-
   const [page, setPage] = useState("login");
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("all");
 
   return (
     <div
@@ -35,10 +37,21 @@ function App() {
         page === "cart" ||
         page === "orders" ||
         page === "profile") && (
-        <Navbar setPage={setPage} />
+        <Navbar
+          setPage={setPage}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filter={filter}
+          setFilter={setFilter}
+        />
       )}
 
-      {page === "products" && <Products />}
+      {page === "products" && (
+        <Products
+          searchTerm={searchTerm}
+          filter={filter}
+        />
+      )}
 
       {page === "cart" && <Cart />}
 

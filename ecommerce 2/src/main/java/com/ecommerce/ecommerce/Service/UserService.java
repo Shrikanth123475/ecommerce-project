@@ -11,4 +11,9 @@ public interface UserService {
   UserResponseDTO register (UserDTO userDTO);
   AuthResponseDTO login (LoginDTO loginDTO);
   void deleteUserByEmail(String email);
+    UserResponseDTO getProfile(String email);
+    UserResponseDTO updateProfile(
+            String email,
+            UserDTO userDTO
+    );
 }

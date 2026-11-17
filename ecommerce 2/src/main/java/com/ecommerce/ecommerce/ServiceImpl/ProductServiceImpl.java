@@ -19,13 +19,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         Product product = Product.builder()
+                .id(productDTO.getId())
                 .name(productDTO.getName())
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
                 .quantity(productDTO.getQuantity())
                 .build();
+        product = productRepository.save(product);
+
+
 
         product = productRepository.save(product);
+        System.out.println("Saved ID = " + product.getId());
 
         return mapToDTO(product);
     }
@@ -75,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductDTO mapToDTO(Product product) {
         return ProductDTO.builder()
-//                .id(product.getId())
+                .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())

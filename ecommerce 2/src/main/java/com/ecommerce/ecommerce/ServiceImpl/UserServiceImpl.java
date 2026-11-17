@@ -85,6 +85,29 @@ public UserServiceImpl (
 
 
 }
+    @Override
+    public UserResponseDTO updateProfile(
+            String email,
+            UserDTO userDTO) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found"
+                        ));
+
+        user.setName(userDTO.getName());
+        user.setAddress(userDTO.getAddress());
+
+        user = userRepository.save(user);
+
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .build();
+    }
 
 @Override
     public void deleteUserByEmail(String email){
@@ -93,11 +116,31 @@ public UserServiceImpl (
 
 User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->new RuntimeException("User not found"));
+
     System.out.println("User exists");
 
 
     userRepository.delete(user);
 }
+
+    @Override
+    public UserResponseDTO getProfile(
+            String email
+    ) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found"
+                        ));
+
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .build();
+    }
 
 
 

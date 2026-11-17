@@ -5,6 +5,7 @@ import com.ecommerce.ecommerce.DTO.OrderResponseDTO;
 import com.ecommerce.ecommerce.Service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.security.Principal;
 import java.util.List;
@@ -38,12 +39,15 @@ import java.util.List;
             return orderService.getOrdersByUser(principal.getName());
         }
         @PutMapping("/{orderId}/cancel")
-        public String cancelOrder(
-                @PathVariable Long orderId,Principal principal) {
+        public OrderResponseDTO cancelOrder(
+                @PathVariable Long orderId,
+                Authentication authentication
+        ) {
 
-            orderService.cancelOrder(orderId,principal.getName());
-
-            return "Order cancelled successfully";
+            return orderService.cancelOrder(
+                    orderId,
+                    authentication.getName()
+            );
         }
 
     }
