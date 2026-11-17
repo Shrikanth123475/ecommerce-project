@@ -6,6 +6,12 @@ import ProductFilters from "../components/ProductFilters";
 function Products() {
   const [products, setProducts] = useState([]);
 
+  const [selectedCategory, setSelectedCategory] =
+    useState("");
+
+  const [selectedBrand, setSelectedBrand] =
+    useState("");
+
   useEffect(() => {
     api
       .get("/products")
@@ -14,6 +20,20 @@ function Products() {
       })
       .catch((err) => console.error(err));
   }, []);
+
+  const filteredProducts = products.filter(
+    (product) => {
+      const categoryMatch =
+        !selectedCategory ||
+        product.category === selectedCategory;
+
+      const brandMatch =
+        !selectedBrand ||
+        product.brand === selectedBrand;
+
+      return categoryMatch && brandMatch;
+    }
+  );
 
   return (
     <div>
@@ -25,7 +45,8 @@ function Products() {
           fontWeight: "bold",
           marginTop: "30px",
           marginBottom: "30px",
-          textShadow: "0 2px 6px rgba(0,0,0,0.1)",
+          textShadow:
+            "0 2px 6px rgba(0,0,0,0.1)",
         }}
       >
         Products
@@ -36,9 +57,17 @@ function Products() {
           display: "flex",
           gap: "20px",
           padding: "20px",
+          alignItems: "flex-start",
         }}
       >
-        <ProductFilters />
+        <ProductFilters
+          selectedCategory={selectedCategory}
+          setSelectedCategory={
+            setSelectedCategory
+          }
+          selectedBrand={selectedBrand}
+          setSelectedBrand={setSelectedBrand}
+        />
 
         <div
           style={{
@@ -48,12 +77,25 @@ function Products() {
             justifyContent: "center",
           }}
         >
-          {products.map((product, index) => (
-            <ProductCard
-              key={index}
-              product={product}
-            />
-          ))}
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(
+              (product, index) => (
+                <ProductCard
+                  key={index}
+                  product={product}
+                />
+              )
+            )
+          ) : (
+            <h2
+              style={{
+                color: "#64748B",
+                marginTop: "50px",
+              }}
+            >
+              No products found
+            </h2>
+          )}
         </div>
       </div>
     </div>
