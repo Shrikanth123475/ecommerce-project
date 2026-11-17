@@ -178,9 +178,8 @@ function Navbar({
 
         <button
           onClick={() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("email");
-            setPage("login");
+            localStorage.clear();
+            window.location.reload();
           }}
           style={{
             ...buttonStyle,

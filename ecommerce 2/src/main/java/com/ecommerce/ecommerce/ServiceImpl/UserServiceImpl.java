@@ -65,15 +65,23 @@ public UserServiceImpl (
     System.out.println("Login request received");
     System.out.println("Email: " + loginDTO.getEmail());
 
-    User user=userRepository.findByEmail(loginDTO.getEmail())
-            .orElseThrow(() -> (
+    User user = userRepository.findByEmail(
+            loginDTO.getEmail()
+    ).orElseThrow(() ->
+            new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid email or password"
+            )
+    );
 
-                 new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User not found")
-            ));
+    if (!user.getPassword().equals(
+            loginDTO.getPassword()
+    )) {
 
-
-    if(!user.getPassword(). equals(loginDTO.getPassword())){
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid Password");
+        throw new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid email or password"
+        );
     }
     String token = jwtService.generateToken(
             user.getEmail()

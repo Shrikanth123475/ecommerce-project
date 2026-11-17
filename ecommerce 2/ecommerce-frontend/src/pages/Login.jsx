@@ -26,6 +26,17 @@ export default function Login({
     setError("");
     setLoading(true);
 
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(formData.email)) {
+      setError(
+        "Please enter a valid email address."
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await api.post(
         "/users/login",
@@ -48,11 +59,20 @@ export default function Login({
         onLoginSuccess();
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        err.message ||
-        "Login failed"
-      );
+      console.log(err);
+
+      if (
+        err.response?.status === 401 ||
+        err.response?.status === 403
+      ) {
+        setError(
+          "Invalid email or password."
+        );
+      } else {
+        setError(
+          "Unable to login. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -117,7 +137,7 @@ export default function Login({
           }}
         >
           <input
-            type="email"
+            type="text"
             name="email"
             placeholder="Email Address"
             value={formData.email}
@@ -171,15 +191,19 @@ export default function Login({
         </form>
 
         {error && (
-          <p
+          <div
             style={{
-              color: "#DC2626",
+              backgroundColor: "#FEE2E2",
+              color: "#B91C1C",
+              padding: "12px",
+              borderRadius: "8px",
               marginTop: "15px",
               textAlign: "center",
+              border: "1px solid #FCA5A5",
             }}
           >
             {error}
-          </p>
+          </div>
         )}
 
         <p
