@@ -1,6 +1,8 @@
 package com.ecommerce.ecommerce.Service;
 
 import com.ecommerce.ecommerce.DTO.ProductDTO;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
@@ -16,6 +18,11 @@ public interface ProductService {
     ProductDTO updateProduct(Long id, ProductDTO productDTO);
 
     void deleteProduct(Long id);
-
-
+    List<ProductDTO> filterProducts(
+            String category,
+            String brand,
+            BigDecimal maxPrice,
+            String sort,
+            String search
+    );
 }

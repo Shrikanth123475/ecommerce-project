@@ -19,4 +19,8 @@ public class ProductDTO {
     private String imageUrl;
     private String category;
     private String brand;
+    private String seller;
+    private String distributor;
+    private String warranty;
+    private String specifications;
 }
