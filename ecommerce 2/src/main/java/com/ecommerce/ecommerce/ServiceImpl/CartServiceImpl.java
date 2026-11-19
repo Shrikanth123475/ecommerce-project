@@ -54,8 +54,8 @@ public class CartServiceImpl implements CartService {
                         cartItem.getProduct().getName(),
                         cartItem.getProduct().getDescription(),
                         cartItem.getProduct().getPrice(),
-                        cartItem.getQuantity()
-
+                        cartItem.getQuantity(),
+                        cartItem.getProduct().getImageUrl()
                 ))
                 .toList();
         return new CartResponseDTO(
@@ -115,6 +115,13 @@ public class CartServiceImpl implements CartService {
         }
 
 
+        if (quantity > product.getQuantity()) {
+            throw new RuntimeException(
+                    "Only " + product.getQuantity()
+                            + " items available in stock"
+            );
+        }
+
         CartItem cartItem = new CartItem();
 
         cartItem.setCart(cart);
@@ -122,13 +129,6 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(quantity);
 
         cartItemRepository.save(cartItem);
-
-        if (quantity > product.getQuantity()) {
-            throw new RuntimeException(
-                    "Only " + product.getQuantity()
-                            + " items available in stock"
-            );
-        }
     }
 
 

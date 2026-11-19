@@ -1,6 +1,5 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
-import com.ecommerce.ecommerce.DTO.OrderDTO;
 import com.ecommerce.ecommerce.DTO.OrderItemResponseDTO;
 import com.ecommerce.ecommerce.DTO.OrderResponseDTO;
 import com.ecommerce.ecommerce.Entity.*;
@@ -16,9 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.ecommerce.ecommerce.Repository.ProductRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,28 +36,25 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() ->
                         new RuntimeException(" User not found"));
 
-
-
-
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() ->
                         new RuntimeException("Cart not found"));
+
         if (cart.getCartItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
+
         System.out.println("Proceeding to create order");
 
-
         Order order = new Order();
-
         order.setUser(user);
         order.setStatus("PLACED");
+        order.setOrderDate(LocalDateTime.now());
 
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CartItem cartItem : cart.getCartItems()) {
-
             Product product = cartItem.getProduct();
 
             if (cartItem.getQuantity() > product.getQuantity()) {
@@ -72,17 +68,14 @@ public class OrderServiceImpl implements OrderService {
                     product.getQuantity()
                             - cartItem.getQuantity()
             );
-
             productRepository.save(product);
 
             OrderItem orderItem = new OrderItem();
-
             orderItem.setOrder(order);
             orderItem.setProduct(product);
             orderItem.setQuantity(cartItem.getQuantity());
 
             BigDecimal price = product.getPrice();
-
             orderItem.setPrice(price);
 
             totalAmount = totalAmount.add(
@@ -95,47 +88,25 @@ public class OrderServiceImpl implements OrderService {
 
             orderItems.add(orderItem);
         }
+
         order.setOrderItems(orderItems);
         order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
 
         cartItemRepository.deleteAll(cart.getCartItems());
-//        cartItemRepository.flush();
-//        System.out.println(
-//                "Cart Items in DB = " + cartItemRepository.count()
-//        );
         cart.getCartItems().clear();
-
         cartRepository.save(cart);
 
-        List<OrderItemResponseDTO> items =
-                savedOrder.getOrderItems()
-                        .stream()
-                        .map(item -> new OrderItemResponseDTO(
-                                item.getProduct().getId(),
-                                item.getProduct().getName(),
-                                item.getProduct().getDescription(),
-                                item.getPrice(),
-                                item.getQuantity()
-                        ))
-                        .toList();
-        return new OrderResponseDTO(
-                savedOrder.getId(),
-                email,
-                totalAmount,
-                savedOrder.getStatus(),
-                items
-        );
-
-
+        return toResponse(savedOrder, email);
     }
-    @Override
-    public OrderResponseDTO getOrderById(Long orderId,String email) {
 
+    @Override
+    public OrderResponseDTO getOrderById(Long orderId, String email) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
+
         if (!order.getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
@@ -143,60 +114,19 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
-        List<OrderItemResponseDTO> items = order.getOrderItems()
-                .stream()
-                .map(item -> new OrderItemResponseDTO(
-                        item.getProduct().getId(),
-                        item.getProduct().getName(),
-                        item.getProduct().getDescription(),
-                        item.getPrice(),
-                        item.getQuantity()
-                ))
-                .toList();
-
-        return new OrderResponseDTO(
-                order.getId(),
-                order.getUser().getEmail(),
-                order.getTotalAmount(),
-                order.getStatus(),
-                items
-        );
+        return toResponse(order, order.getUser().getEmail());
     }
 
     @Override
     public List<OrderResponseDTO> getOrdersByUser(String email) {
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-        List<Order> orders =
-                orderRepository.findByUserOrderByIdDesc(user);
-
-        return orders.stream()
-                .map(order -> {
-
-                    List<OrderItemResponseDTO> items =
-                            order.getOrderItems()
-                                    .stream()
-                                    .map(item -> new OrderItemResponseDTO(
-                                            item.getProduct().getId(),
-                                            item.getProduct().getName(),
-                                            item.getProduct().getDescription(),
-                                            item.getPrice(),
-                                            item.getQuantity()
-                                    ))
-                                    .toList();
-
-                    return new OrderResponseDTO(
-                            order.getId(),
-                            email,
-                            order.getTotalAmount(),
-                            order.getStatus(),
-                            items
-                    );
-
-                }).toList();
+        return orderRepository.findByUserOrderByIdDesc(user)
+                .stream()
+                .map(order -> toResponse(order, email))
+                .toList();
     }
 
     @Override
@@ -204,7 +134,6 @@ public class OrderServiceImpl implements OrderService {
             Long orderId,
             String email
     ) {
-
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
@@ -223,43 +152,40 @@ public class OrderServiceImpl implements OrderService {
         }
 
         for (OrderItem orderItem : order.getOrderItems()) {
-
             Product product = orderItem.getProduct();
-
             product.setQuantity(
                     product.getQuantity()
                             + orderItem.getQuantity()
             );
-
             productRepository.save(product);
-
-
-
         }
 
         order.setStatus("CANCELLED");
-
         Order savedOrder = orderRepository.save(order);
 
-        List<OrderItemResponseDTO> items =
-                savedOrder.getOrderItems()
-                        .stream()
-                        .map(item -> new OrderItemResponseDTO(
-                                item.getProduct().getId(),
-                                item.getProduct().getName(),
-                                item.getProduct().getDescription(),
-                                item.getPrice(),
-                                item.getQuantity()
-                        ))
-                        .toList();
-
-        return new OrderResponseDTO(
-                savedOrder.getId(),
-                savedOrder.getUser().getEmail(),
-                savedOrder.getTotalAmount(),
-                savedOrder.getStatus(),
-                items
-        );
+        return toResponse(savedOrder, savedOrder.getUser().getEmail());
     }
 
+    private OrderResponseDTO toResponse(Order order, String email) {
+        List<OrderItemResponseDTO> items = order.getOrderItems()
+                .stream()
+                .map(item -> new OrderItemResponseDTO(
+                        item.getProduct().getId(),
+                        item.getProduct().getName(),
+                        item.getProduct().getDescription(),
+                        item.getPrice(),
+                        item.getQuantity(),
+                        item.getProduct().getImageUrl()
+                ))
+                .toList();
+
+        return new OrderResponseDTO(
+                order.getId(),
+                email,
+                order.getTotalAmount(),
+                order.getStatus(),
+                items,
+                order.getOrderDate()
+        );
+    }
 }
