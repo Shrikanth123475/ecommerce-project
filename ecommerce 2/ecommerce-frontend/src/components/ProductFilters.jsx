@@ -6,6 +6,8 @@ function ProductFilters({
   setSelectedCategory,
   selectedBrand,
   setSelectedBrand,
+  maxPrice,
+  setMaxPrice,
 }) {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -29,39 +31,61 @@ function ProductFilters({
     }
   };
 
+  const clearFilters = () => {
+    setSelectedCategory("");
+    setSelectedBrand("");
+    setMaxPrice(1000000);
+  };
+
   return (
     <div
       style={{
         width: "280px",
         minWidth: "280px",
-        backgroundColor: "#FFFFFF",
-        padding: "24px",
-        borderRadius: "16px",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-        height: "fit-content",
+
         position: "sticky",
-        top: "100px",
+        top: "110px",
+
+        alignSelf: "flex-start",
+
+        background:
+          "linear-gradient(to bottom, #FFFFFF, #F8FBFF)",
+
+        border: "1px solid #DCEAFE",
+
+        borderRadius: "16px",
+
+        padding: "24px",
+
+        boxShadow:
+          "0 8px 24px rgba(37,99,235,0.08)",
+
+        zIndex: 100,
+
+        height: "fit-content",
       }}
     >
-      {/* Header */}
       <h2
         style={{
-          color: "#1E40AF",
-          fontSize: "28px",
+          margin: 0,
           marginBottom: "20px",
-          borderBottom: "2px solid #DBEAFE",
-          paddingBottom: "12px",
+          color: "#1E3A8A",
+          fontSize: "32px",
+          fontWeight: "700",
         }}
       >
         🔍 Filters
       </h2>
 
+      <hr />
+
       {/* Categories */}
-      <div>
+      <div style={{ marginTop: "20px" }}>
         <h3
           style={{
             color: "#1E3A8A",
-            fontSize: "20px",
+            fontSize: "24px",
+            fontWeight: "700",
             marginBottom: "15px",
           }}
         >
@@ -70,11 +94,9 @@ function ProductFilters({
 
         <label
           style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "12px",
+            display: "block",
+            marginBottom: "10px",
             cursor: "pointer",
-            color: "#475569",
           }}
         >
           <input
@@ -84,28 +106,17 @@ function ProductFilters({
             onChange={() =>
               setSelectedCategory("")
             }
-          />
-
-          <span
-            style={{
-              marginLeft: "10px",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            All Categories
-          </span>
+          />{" "}
+          All Categories
         </label>
 
         {categories.map((category) => (
           <label
             key={category}
             style={{
-              display: "flex",
-              alignItems: "center",
-              marginBottom: "12px",
+              display: "block",
+              marginBottom: "10px",
               cursor: "pointer",
-              color: "#475569",
             }}
           >
             <input
@@ -115,27 +126,20 @@ function ProductFilters({
                 selectedCategory === category
               }
               onChange={() =>
-                setSelectedCategory(category)
+                setSelectedCategory(
+                  category
+                )
               }
-            />
-
-            <span
-              style={{
-                marginLeft: "10px",
-                fontSize: "16px",
-              }}
-            >
-              {category}
-            </span>
+            />{" "}
+            {category}
           </label>
         ))}
       </div>
 
-      <div
+      <hr
         style={{
-          height: "1px",
-          backgroundColor: "#E2E8F0",
-          margin: "20px 0",
+          marginTop: "20px",
+          marginBottom: "20px",
         }}
       />
 
@@ -144,7 +148,8 @@ function ProductFilters({
         <h3
           style={{
             color: "#1E3A8A",
-            fontSize: "20px",
+            fontSize: "24px",
+            fontWeight: "700",
             marginBottom: "15px",
           }}
         >
@@ -153,11 +158,9 @@ function ProductFilters({
 
         <label
           style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "12px",
+            display: "block",
+            marginBottom: "10px",
             cursor: "pointer",
-            color: "#475569",
           }}
         >
           <input
@@ -167,28 +170,17 @@ function ProductFilters({
             onChange={() =>
               setSelectedBrand("")
             }
-          />
-
-          <span
-            style={{
-              marginLeft: "10px",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            All Brands
-          </span>
+          />{" "}
+          All Brands
         </label>
 
         {brands.map((brand) => (
           <label
             key={brand}
             style={{
-              display: "flex",
-              alignItems: "center",
-              marginBottom: "12px",
+              display: "block",
+              marginBottom: "10px",
               cursor: "pointer",
-              color: "#475569",
             }}
           >
             <input
@@ -200,25 +192,16 @@ function ProductFilters({
               onChange={() =>
                 setSelectedBrand(brand)
               }
-            />
-
-            <span
-              style={{
-                marginLeft: "10px",
-                fontSize: "16px",
-              }}
-            >
-              {brand}
-            </span>
+            />{" "}
+            {brand}
           </label>
         ))}
       </div>
 
-      <div
+      <hr
         style={{
-          height: "1px",
-          backgroundColor: "#E2E8F0",
-          margin: "20px 0",
+          marginTop: "20px",
+          marginBottom: "20px",
         }}
       />
 
@@ -227,7 +210,8 @@ function ProductFilters({
         <h3
           style={{
             color: "#1E3A8A",
-            fontSize: "20px",
+            fontSize: "24px",
+            fontWeight: "700",
             marginBottom: "15px",
           }}
         >
@@ -237,49 +221,54 @@ function ProductFilters({
         <input
           type="range"
           min="0"
-          max="100000"
-          defaultValue="100000"
+          max="1000000"
+          step="1000"
+          value={maxPrice}
+          onChange={(e) =>
+            setMaxPrice(
+              Number(e.target.value)
+            )
+          }
           style={{
             width: "100%",
             cursor: "pointer",
           }}
         />
 
-        <div
+        <p
           style={{
-            marginTop: "12px",
             color: "#2563EB",
             fontWeight: "bold",
+            fontSize: "18px",
+            marginTop: "12px",
           }}
         >
-          ₹0 - ₹100000
-        </div>
+          ₹0 - ₹
+          {Number(maxPrice).toLocaleString(
+            "en-IN"
+          )}
+        </p>
       </div>
 
-      <div
+      <button
+        onClick={clearFilters}
         style={{
+          width: "100%",
           marginTop: "25px",
+          padding: "14px",
+          backgroundColor: "#2563EB",
+          color: "#FFFFFF",
+          border: "none",
+          borderRadius: "10px",
+          fontWeight: "bold",
+          fontSize: "15px",
+          cursor: "pointer",
+          boxShadow:
+            "0 4px 12px rgba(37,99,235,0.3)",
         }}
       >
-        <button
-          onClick={() => {
-            setSelectedCategory("");
-            setSelectedBrand("");
-          }}
-          style={{
-            width: "100%",
-            padding: "12px",
-            backgroundColor: "#2563EB",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: "10px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          Clear Filters
-        </button>
-      </div>
+        Clear Filters
+      </button>
     </div>
   );
 }
