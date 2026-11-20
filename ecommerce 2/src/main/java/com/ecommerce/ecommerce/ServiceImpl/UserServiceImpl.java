@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import com.ecommerce.ecommerce.DTO.AuthResponseDTO;
 import com.ecommerce.ecommerce.DTO.LoginDTO;
 import com.ecommerce.ecommerce.DTO.UserDTO;
 import com.ecommerce.ecommerce.DTO.UserResponseDTO;
@@ -7,6 +8,7 @@ import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.User;
 import com.ecommerce.ecommerce.Repository.CartRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
+import com.ecommerce.ecommerce.Service.JwtService;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserServiceImpl implements UserService {
 private final UserRepository userRepository;
 private final CartRepository cartRepository;
+private final JwtService jwtService;
 
 public UserServiceImpl (
         UserRepository userRepository,
-        CartRepository cartRepository
+        CartRepository cartRepository,
+        JwtService jwtService
 ){
     this.userRepository=userRepository;
     this.cartRepository=cartRepository;
+    this.jwtService=jwtService;
 
 }
 
@@ -55,47 +60,95 @@ public UserServiceImpl (
     );
 }
 @Override
-    public UserResponseDTO login (LoginDTO loginDTO){
+    public AuthResponseDTO login (LoginDTO loginDTO){
 
     System.out.println("Login request received");
     System.out.println("Email: " + loginDTO.getEmail());
 
-    User user=userRepository.findByEmail(loginDTO.getEmail())
-            .orElseThrow(() -> {
+    User user = userRepository.findByEmail(
+            loginDTO.getEmail()
+    ).orElseThrow(() ->
+            new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid email or password"
+            )
+    );
 
-                return new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User not found");
-            });
+    if (!user.getPassword().equals(
+            loginDTO.getPassword()
+    )) {
 
-
-    if(!user.getPassword(). equals(loginDTO.getPassword())){
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid Password");
+        throw new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid email or password"
+        );
     }
-
-
-    return new UserResponseDTO(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            user.getAddress()
+    String token = jwtService.generateToken(
+            user.getEmail()
     );
 
 
+    return new AuthResponseDTO(token);
+
+
 
 }
+    @Override
+    public UserResponseDTO updateProfile(
+            String email,
+            UserDTO userDTO) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found"
+                        ));
+
+        user.setName(userDTO.getName());
+        user.setAddress(userDTO.getAddress());
+
+        user = userRepository.save(user);
+
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .build();
+    }
 
 @Override
-    public void deleteUser(Long id){
+    public void deleteUserByEmail(String email){
 
-    System.out.println("Deleting user: " + id);
+    System.out.println("Deleting user: " + email);
 
-    if(!userRepository.existsById(id)){
-        throw new RuntimeException("User not found");
-    }
+User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->new RuntimeException("User not found"));
+
     System.out.println("User exists");
 
 
-    userRepository.deleteById(id);
+    userRepository.delete(user);
 }
+
+    @Override
+    public UserResponseDTO getProfile(
+            String email
+    ) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found"
+                        ));
+
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .build();
+    }
 
 
 

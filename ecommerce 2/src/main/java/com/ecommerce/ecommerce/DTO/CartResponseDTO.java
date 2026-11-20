@@ -12,6 +12,6 @@ import java.util.List;
 public class CartResponseDTO {
 
     private Long cartId;
-    private Long userId;
+    private String email;
     private List<CartItemResponseDTO> items;
 }

@@ -6,6 +6,8 @@ import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Service.CartService;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
@@ -13,14 +15,22 @@ public class CartController {
     private final CartService cartService;
 
     public CartController(CartService cartService) {
+
         this.cartService = cartService;
     }
 
     @PostMapping("/add")
-    public String addToCart(@RequestBody CartDTO cartDTO) {
+    public String addToCart(@RequestBody CartDTO cartDTO,Principal principal) {
+
+
+        System.out.println("Controller ProductId = "
+                + cartDTO.getProductId());
+
+        System.out.println("Controller Quantity = "
+                + cartDTO.getQuantity());
 
         cartService.addToCart(
-                cartDTO.getUserId(),
+                principal.getName(),
                 cartDTO.getProductId(),
                 cartDTO.getQuantity()
         );
@@ -28,12 +38,12 @@ public class CartController {
         return "Product added to cart successfully";
     }
 
-    @GetMapping("/{userId}")
-    public CartResponseDTO getCart(@PathVariable Long userId) {
+    @GetMapping()
+    public CartResponseDTO getCart(Principal principal) {
+         String email = principal.getName();
+        System.out.println(" email in cart get mapping  is  " + email);
 
-        System.out.println("Getting cart for user " + userId);
-
-        return cartService.getCartByUserId(userId);
+        return cartService.getCartByEmail(email);
     }
 
     @DeleteMapping("/{cartItemId}")

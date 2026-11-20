@@ -4,9 +4,12 @@ import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.CartItem;
 import com.ecommerce.ecommerce.Repository.CartItemRepository;
 import com.ecommerce.ecommerce.Repository.CartRepository;
+import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.ecommerce.ecommerce.Service.CartItemService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -14,6 +17,7 @@ import java.util.List;
 public class CartItemServiceImpl implements CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
+//    private final ProductRepository productRepository;
 
     public CartItemServiceImpl(
             CartItemRepository cartItemRepository,
@@ -37,12 +41,24 @@ public class CartItemServiceImpl implements CartItemService {
         return cartItemRepository.findByCart(cart);
     }
     @Override
-    public void removeCartItem(Long cartItemId) {
+    public void removeCartItem(Long cartItemId,String email) {
 
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
                                 new RuntimeException("Cart Item not found"));
+
+        String ownerEmail=cartItem
+                .getCart()
+                        .getUser()
+                                .getEmail();
+
+        if(!ownerEmail.equals(email)){
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "you cannot delete another users cart item"
+            );
+        }
 
         cartItemRepository.delete(cartItem);
     }
@@ -55,35 +71,87 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new RuntimeException(
+                                        "Cart Item not found"));
+
+        int productStock =
+                cartItem.getProduct().getQuantity();
+
+        if (quantity > productStock) {
+            throw new RuntimeException(
+                    "Only " + productStock +
+                            " item(s) available in stock"
+            );
+        }
 
         cartItem.setQuantity(quantity);
 
         return cartItemRepository.save(cartItem);
     }
+
+
     @Override
-    public CartItem incrementQuantity(Long cartItemId){
+    public CartItem incrementQuantity(
+            Long cartItemId,
+            String email) {
 
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new RuntimeException(
+                                        "Cart Item not found"));
+
+        String ownerEmail =
+                cartItem.getCart()
+                        .getUser()
+                        .getEmail();
+
+        if (!ownerEmail.equals(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot modify another user's cart item"
+            );
+        }
+
+        int availableStock =
+                cartItem.getProduct().getQuantity();
+
+        if (cartItem.getQuantity() >= availableStock) {
+            throw new RuntimeException(
+                    "Only " + availableStock +
+                            " item(s) available in stock"
+            );
+        }
 
         return updateQuantity(
                 cartItemId,
                 cartItem.getQuantity() + 1
         );
     }
-
     @Override
-    public CartItem decrementQuantity(Long cartItemId){
+    public CartItem decrementQuantity(
+            Long cartItemId,
+            String email) {
 
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new RuntimeException(
+                                        "Cart Item not found"));
 
-        if(cartItem.getQuantity() == 1){
+        String ownerEmail =
+                cartItem.getCart()
+                        .getUser()
+                        .getEmail();
+
+        if (!ownerEmail.equals(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot modify another user's cart item"
+            );
+        }
+
+        if (cartItem.getQuantity() == 1) {
             cartItemRepository.delete(cartItem);
             return null;
         }
