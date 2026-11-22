@@ -71,7 +71,7 @@ export default function OrdersScreen() {
             >
               <View style={styles.cardHeader}>
                 <View>
-                  <Text style={styles.orderId}>Order #{order.orderId}</Text>
+                  <Text style={styles.orderId}>Order #{order.orderNumber}</Text>
                   <Text style={styles.date}>{formatDate(order.orderDate)}</Text>
                 </View>
                 <StatusBadge status={order.status} />

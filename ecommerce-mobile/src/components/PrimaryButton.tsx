@@ -30,5 +30,5 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   pressed: { opacity: 0.8 },
-  text: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  text: { color: "#fff", fontSize: 16, fontWeight: "700", userSelect: "none" },
 });

@@ -7,6 +7,7 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Brand } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { getErrorMessage } from "@/services/api";
 import { cancelOrder, getOrder, type Order } from "@/services/orderService";
 import { confirmAction } from "@/utils/confirm";
@@ -15,6 +16,7 @@ import { formatDate, formatPrice } from "@/utils/format";
 export default function OrderDetails() {
   const router = useRouter();
   const { user } = useAuth();
+  const toast = useToast();
   const { id, placed } = useLocalSearchParams<{ id: string; placed?: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,20 +39,20 @@ export default function OrderDetails() {
 
   const handleCancel = async () => {
     if (!order) return;
-    const ok = await confirmAction("Cancel order?", `Order #${order.orderId} will be cancelled.`, "Cancel order");
+    const ok = await confirmAction("Cancel order?", `Order #${order.orderNumber} will be cancelled.`, "Cancel order");
     if (!ok) return;
     setCancelling(true);
     setError(null);
     try {
       setOrder(await cancelOrder(order.orderId));
     } catch (e) {
-      setError(getErrorMessage(e, "Couldn't cancel this order."));
+      toast.show(getErrorMessage(e, "Couldn't cancel this order."), "error");
     } finally {
       setCancelling(false);
     }
   };
 
-  const title = `Order #${id}`;
+  const title = order ? `Order #${order.orderNumber}` : "Order";
 
   if (loading) {
     return (
@@ -88,7 +90,7 @@ export default function OrderDetails() {
 
       <View style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={styles.heading}>Order #{order.orderId}</Text>
+          <Text style={styles.heading}>Order #{order.orderNumber}</Text>
           <StatusBadge status={order.status} />
         </View>
         {order.orderDate ? <Text style={styles.muted}>Placed on {formatDate(order.orderDate)}</Text> : null}

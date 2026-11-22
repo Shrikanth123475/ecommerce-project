@@ -5,7 +5,9 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-nat
 
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { Brand } from "@/constants/theme";
-import { getErrorMessage } from "@/services/api";
+import { useToast } from "@/context/ToastContext";
+import { getErrorMessage, isStockError } from "@/services/api";
+import { showAlert } from "@/utils/confirm";
 import { addToCart } from "@/services/cartService";
 import { getProduct, type Product } from "@/services/productService";
 import { formatPrice } from "@/utils/format";
@@ -28,8 +30,8 @@ export default function ProductDetails() {
   const [attempt, setAttempt] = useState(0);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
-  const [cartError, setCartError] = useState<string | null>(null);
   const router = useRouter();
+  const toast = useToast();
 
   useEffect(() => {
     let cancelled = false;
@@ -70,12 +72,16 @@ export default function ProductDetails() {
 
   const handleAddToCart = async () => {
     setAdding(true);
-    setCartError(null);
     try {
       await addToCart(product.id, 1);
       setAdded(true);
     } catch (e) {
-      setCartError(getErrorMessage(e, "Couldn't add this item to your cart."));
+      if (isStockError(e)) {
+        showAlert("Limited stock", getErrorMessage(e));
+        getProduct(id).then(setProduct).catch(() => {}); // refresh stock label
+      } else {
+        toast.show(getErrorMessage(e, "Couldn't add this item to your cart."), "error");
+      }
     } finally {
       setAdding(false);
     }
@@ -129,7 +135,6 @@ export default function ProductDetails() {
     </ScrollView>
 
     <View style={styles.footer}>
-      {cartError ? <Text style={styles.cartError}>{cartError}</Text> : null}
       {outOfStock ? (
         <Text style={styles.soldOut}>Currently out of stock</Text>
       ) : added ? (
@@ -147,7 +152,6 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   footer: { backgroundColor: "#fff", padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: "#EEF0F4" },
-  cartError: { color: Brand.error, fontSize: 13 },
   soldOut: { textAlign: "center", color: Brand.error, fontWeight: "700", paddingVertical: 12 },
   center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
   message: { color: "#60646C", fontSize: 15, textAlign: "center" },

@@ -58,9 +58,12 @@ public class OrderServiceImpl implements OrderService {
             Product product = cartItem.getProduct();
 
             if (cartItem.getQuantity() > product.getQuantity()) {
-                throw new RuntimeException(
-                        product.getName()
-                                + " does not have enough stock"
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        product.getQuantity() <= 0
+                                ? product.getName() + " is out of stock"
+                                : "Only " + product.getQuantity() + " of "
+                                + product.getName() + " left in stock"
                 );
             }
 
@@ -179,8 +182,12 @@ public class OrderServiceImpl implements OrderService {
                 ))
                 .toList();
 
+        long orderNumber = orderRepository
+                .countByUserAndIdLessThanEqual(order.getUser(), order.getId());
+
         return new OrderResponseDTO(
                 order.getId(),
+                orderNumber,
                 email,
                 order.getTotalAmount(),
                 order.getStatus(),

@@ -11,7 +11,9 @@ import com.ecommerce.ecommerce.Repository.CartRepository;
 import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.CartService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,6 +38,13 @@ public class CartServiceImpl implements CartService {
 
     }
 
+    private ResponseStatusException outOfStock(int available) {
+        String message = available <= 0
+                ? "Sorry, this product is out of stock"
+                : "Only " + available + " item(s) available in stock";
+        return new ResponseStatusException(HttpStatus.CONFLICT, message);
+    }
+
     @Override
     public CartResponseDTO getCartByEmail(String email){
         User user = userRepository.findByEmail(email)
@@ -55,7 +64,8 @@ public class CartServiceImpl implements CartService {
                         cartItem.getProduct().getDescription(),
                         cartItem.getProduct().getPrice(),
                         cartItem.getQuantity(),
-                        cartItem.getProduct().getImageUrl()
+                        cartItem.getProduct().getImageUrl(),
+                        cartItem.getProduct().getQuantity()
                 ))
                 .toList();
         return new CartResponseDTO(
@@ -102,10 +112,7 @@ public class CartServiceImpl implements CartService {
                     existingCartItem.getQuantity() + quantity;
 
             if (newQuantity > product.getQuantity()) {
-                throw new RuntimeException(
-                        "Only " + product.getQuantity()
-                                + " items available in stock"
-                );
+                throw outOfStock(product.getQuantity());
             }
 
             existingCartItem.setQuantity(newQuantity);
@@ -116,10 +123,7 @@ public class CartServiceImpl implements CartService {
 
 
         if (quantity > product.getQuantity()) {
-            throw new RuntimeException(
-                    "Only " + product.getQuantity()
-                            + " items available in stock"
-            );
+            throw outOfStock(product.getQuantity());
         }
 
         CartItem cartItem = new CartItem();

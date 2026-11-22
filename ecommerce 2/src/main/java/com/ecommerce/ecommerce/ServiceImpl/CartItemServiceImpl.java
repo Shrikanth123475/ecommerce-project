@@ -26,6 +26,13 @@ public class CartItemServiceImpl implements CartItemService {
         this.cartItemRepository=cartItemRepository;
         this.cartRepository=cartRepository;
     }
+    private ResponseStatusException outOfStock(int available) {
+        String message = available <= 0
+                ? "Sorry, this product is out of stock"
+                : "Only " + available + " item(s) available in stock";
+        return new ResponseStatusException(HttpStatus.CONFLICT, message);
+    }
+
     @Override
     public CartItem addCartItem(CartItem cartItem){
         return cartItemRepository.save(cartItem);
@@ -78,10 +85,7 @@ public class CartItemServiceImpl implements CartItemService {
                 cartItem.getProduct().getQuantity();
 
         if (quantity > productStock) {
-            throw new RuntimeException(
-                    "Only " + productStock +
-                            " item(s) available in stock"
-            );
+            throw outOfStock(productStock);
         }
 
         cartItem.setQuantity(quantity);
@@ -117,10 +121,7 @@ public class CartItemServiceImpl implements CartItemService {
                 cartItem.getProduct().getQuantity();
 
         if (cartItem.getQuantity() >= availableStock) {
-            throw new RuntimeException(
-                    "Only " + availableStock +
-                            " item(s) available in stock"
-            );
+            throw outOfStock(availableStock);
         }
 
         return updateQuantity(

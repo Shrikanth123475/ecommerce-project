@@ -52,12 +52,7 @@ public UserServiceImpl (
     cart.setUser(savedUser);
     savedUser.setCart(cart);
     cartRepository.save(cart);
-    return new UserResponseDTO(
-            savedUser.getId(),
-            savedUser.getName(),
-            savedUser.getEmail(),
-            savedUser.getAddress()
-    );
+    return toResponse(savedUser);
 }
 @Override
     public AuthResponseDTO login (LoginDTO loginDTO){
@@ -106,15 +101,15 @@ public UserServiceImpl (
 
         user.setName(userDTO.getName());
         user.setAddress(userDTO.getAddress());
+        user.setPhone(userDTO.getPhone());
+        user.setGender(userDTO.getGender());
+        user.setDateOfBirth(userDTO.getDateOfBirth());
+        user.setCity(userDTO.getCity());
+        user.setPincode(userDTO.getPincode());
 
         user = userRepository.save(user);
 
-        return UserResponseDTO.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .address(user.getAddress())
-                .build();
+        return toResponse(user);
     }
 
 @Override
@@ -142,14 +137,22 @@ User user = userRepository.findByEmail(email)
                                 "User not found"
                         ));
 
+        return toResponse(user);
+    }
+
+
+
+    private UserResponseDTO toResponse(User user) {
         return UserResponseDTO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .address(user.getAddress())
+                .phone(user.getPhone())
+                .gender(user.getGender())
+                .dateOfBirth(user.getDateOfBirth())
+                .city(user.getCity())
+                .pincode(user.getPincode())
                 .build();
     }
-
-
-
 }

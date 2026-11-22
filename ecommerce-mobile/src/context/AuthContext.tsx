@@ -2,8 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 
 import { setSessionExpiredHandler } from "@/services/api";
 import * as authService from "@/services/authService";
-import type { RegisterInput, User } from "@/services/authService";
+import type { ProfileInput, RegisterInput, User } from "@/services/authService";
 import { clearToken, getToken, saveToken } from "@/storage/authStorage";
+
+import { useToast } from "./ToastContext";
 
 type AuthContextValue = {
   token: string | null;
@@ -12,6 +14,7 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (input: RegisterInput) => Promise<void>;
   signOut: () => Promise<void>;
+  updateProfile: (input: ProfileInput) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -20,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   const signOut = useCallback(async () => {
     await clearToken();
@@ -28,9 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    setSessionExpiredHandler(signOut);
+    setSessionExpiredHandler(() => {
+      signOut().then(() => toast.show("Your session expired. Please log in again.", "info"));
+    });
     return () => setSessionExpiredHandler(null);
-  }, [signOut]);
+  }, [signOut, toast]);
 
   useEffect(() => {
     (async () => {
@@ -70,9 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [signIn],
   );
 
+  const updateProfile = useCallback(async (input: ProfileInput) => {
+    setUser(await authService.updateProfile(input));
+  }, []);
+
   const value = useMemo(
-    () => ({ token, user, loading, signIn, signUp, signOut }),
-    [token, user, loading, signIn, signUp, signOut],
+    () => ({ token, user, loading, signIn, signUp, signOut, updateProfile }),
+    [token, user, loading, signIn, signUp, signOut, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

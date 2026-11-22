@@ -40,11 +40,14 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: 1.5,
-    borderBottomColor: Brand.border,
+    borderWidth: 1,
+    borderColor: Brand.border,
+    borderRadius: 8,
+    backgroundColor: "#FAFBFC",
+    paddingHorizontal: 12,
   },
-  inputError: { borderBottomColor: Brand.error },
-  input: { flex: 1, fontSize: 16, paddingVertical: 10, color: "#111" },
+  inputError: { borderColor: Brand.error },
+  input: { flex: 1, fontSize: 16, paddingVertical: 12, color: "#111" },
   toggle: { color: Brand.primary, fontWeight: "600", fontSize: 14 },
   error: { color: Brand.error, fontSize: 12, marginTop: 4 },
 });

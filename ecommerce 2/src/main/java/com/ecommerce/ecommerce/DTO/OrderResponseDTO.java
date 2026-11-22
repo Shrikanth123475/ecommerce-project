@@ -14,6 +14,8 @@ import java.util.List;
 public class OrderResponseDTO {
 
     private Long orderId;
+    // 1, 2, 3... counted separately for each user (orderId is the global database id)
+    private Long orderNumber;
     private String email;
     private BigDecimal totalAmount;
     private String status;

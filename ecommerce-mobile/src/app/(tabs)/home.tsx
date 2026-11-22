@@ -13,6 +13,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FilterChips } from "@/components/FilterChips";
+import { HomeHighlights } from "@/components/HomeHighlights";
+import { LogoMark } from "@/components/Logo";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ProductCard } from "@/components/ProductCard";
 import { Brand } from "@/constants/theme";
@@ -63,6 +65,8 @@ export default function Home() {
     getCategories().then(setCategories).catch(() => {});
     getBrands().then(setBrands).catch(() => {});
   }, []);
+
+  const filtersActive = Boolean(debouncedSearch || category || brand);
 
   const loadProducts = useCallback(
     async (isRefresh = false) => {
@@ -120,6 +124,7 @@ export default function Home() {
         refreshing={refreshing}
         onRefresh={() => loadProducts(true)}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={filtersActive ? undefined : <HomeHighlights products={products} />}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -135,16 +140,18 @@ export default function Home() {
   return (
     <SafeAreaView style={styles.screen} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.brand}>ShopEase</Text>
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Search for products"
-          placeholderTextColor="#9AA0AA"
-          style={styles.search}
-          returnKeyType="search"
-          autoCorrect={false}
-        />
+        <View style={styles.searchRow}>
+          <LogoMark size={42} />
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search for products"
+            placeholderTextColor="#9AA0AA"
+            style={styles.search}
+            returnKeyType="search"
+            autoCorrect={false}
+          />
+        </View>
       </View>
 
       <View style={styles.filters}>
@@ -166,9 +173,10 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#F1F3F6" },
-  header: { backgroundColor: Brand.primary, paddingHorizontal: H_PADDING, paddingBottom: 12, gap: 10 },
-  brand: { color: "#fff", fontSize: 20, fontWeight: "800", paddingTop: 8 },
+  header: { backgroundColor: Brand.primary, paddingHorizontal: H_PADDING, paddingBottom: 12 },
+  searchRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingTop: 10 },
   search: {
+    flex: 1,
     backgroundColor: "#fff",
     borderRadius: 4,
     paddingHorizontal: 12,

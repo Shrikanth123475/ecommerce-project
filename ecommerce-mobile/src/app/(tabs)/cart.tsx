@@ -8,7 +8,8 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { Brand } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
-import { getErrorMessage } from "@/services/api";
+import { useToast } from "@/context/ToastContext";
+import { getErrorMessage, isStockError } from "@/services/api";
 import {
   cartCount,
   cartTotal,
@@ -20,11 +21,13 @@ import {
   type CartItem,
 } from "@/services/cartService";
 import { placeOrder } from "@/services/orderService";
+import { showAlert } from "@/utils/confirm";
 import { formatPrice } from "@/utils/format";
 
 export default function CartScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const toast = useToast();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,14 +57,19 @@ export default function CartScreen() {
     }, [load]),
   );
 
-  const change = async (item: CartItem, action: (id: number) => Promise<void>) => {
+  const change = async (item: CartItem, action: (id: number) => Promise<void>, removes = false) => {
     setBusyId(item.cartItemId);
     setError(null);
     try {
       await action(item.cartItemId);
       setCart(await getCart());
     } catch (e) {
-      setError(getErrorMessage(e, "Couldn't update your cart."));
+      if (isStockError(e)) {
+        showAlert("Limited stock", getErrorMessage(e));
+        setCart(await getCart().catch(() => cart)); // refresh so the stock shown is current
+      } else {
+        toast.show(getErrorMessage(e, "Couldn't update your cart."), "error");
+      }
     } finally {
       setBusyId(null);
     }
@@ -75,7 +83,12 @@ export default function CartScreen() {
       setCart((current) => (current ? { ...current, items: [] } : current));
       router.push({ pathname: "/order/[id]", params: { id: String(order.orderId), placed: "1" } });
     } catch (e) {
-      setError(getErrorMessage(e, "Couldn't place your order."));
+      if (isStockError(e)) {
+        showAlert("Can't place order", getErrorMessage(e));
+        setCart(await getCart().catch(() => cart));
+      } else {
+        toast.show(getErrorMessage(e, "Couldn't place your order."), "error");
+      }
     } finally {
       setPlacing(false);
     }
@@ -141,16 +154,32 @@ export default function CartScreen() {
                   {item.productName}
                 </Text>
                 <Text style={styles.price}>{formatPrice(item.price)}</Text>
+                {item.stock <= 0 ? (
+                  <Text style={[styles.stock, { color: Brand.error }]}>Out of stock</Text>
+                ) : item.quantity >= item.stock ? (
+                  <Text style={[styles.stock, { color: Brand.accent }]}>Only {item.stock} in stock – max reached</Text>
+                ) : item.stock <= 5 ? (
+                  <Text style={[styles.stock, { color: Brand.accent }]}>Only {item.stock} left</Text>
+                ) : null}
               </View>
             </Pressable>
             <View style={styles.actions}>
               <QuantityStepper
                 quantity={item.quantity}
                 disabled={busyId === item.cartItemId}
-                onIncrement={() => change(item, incrementItem)}
-                onDecrement={() => change(item, decrementItem)}
+                onIncrement={() =>
+                  item.quantity >= item.stock
+                    ? showAlert(
+                        item.stock <= 0 ? "Out of stock" : "Limited stock",
+                        item.stock <= 0
+                          ? `${item.productName} is out of stock right now.`
+                          : `Only ${item.stock} unit(s) of ${item.productName} available. You already have ${item.quantity} in your cart.`,
+                      )
+                    : change(item, incrementItem)
+                }
+                onDecrement={() => change(item, decrementItem, item.quantity === 1)}
               />
-              <Pressable onPress={() => change(item, removeItem)} disabled={busyId === item.cartItemId} hitSlop={8}>
+              <Pressable onPress={() => change(item, removeItem, true)} disabled={busyId === item.cartItemId} hitSlop={8}>
                 <Text style={styles.remove}>REMOVE</Text>
               </Pressable>
             </View>
@@ -221,6 +250,7 @@ const styles = StyleSheet.create({
   info: { flex: 1, gap: 6 },
   name: { fontSize: 15, color: "#212121" },
   price: { fontSize: 17, fontWeight: "700", color: "#212121" },
+  stock: { fontSize: 12, fontWeight: "600" },
   actions: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   remove: { color: "#60646C", fontSize: 13, fontWeight: "700" },
   sectionTitle: { fontSize: 14, color: "#878787", fontWeight: "700" },
