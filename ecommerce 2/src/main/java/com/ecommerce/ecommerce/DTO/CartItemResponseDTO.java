@@ -19,4 +19,5 @@ public class CartItemResponseDTO {
     private Integer quantity;
     private String imageUrl;
     private Integer stock;
+    private String size;
 }

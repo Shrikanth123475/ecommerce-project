@@ -120,7 +120,12 @@ public class CartItemServiceImpl implements CartItemService {
         int availableStock =
                 cartItem.getProduct().getQuantity();
 
-        if (cartItem.getQuantity() >= availableStock) {
+        // Stock is per product: count every size of this product in the same cart.
+        int totalInCart = cartItem.getCart().getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(cartItem.getProduct().getId()))
+                .mapToInt(CartItem::getQuantity)
+                .sum();
+        if (totalInCart >= availableStock) {
             throw outOfStock(availableStock);
         }
 

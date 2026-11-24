@@ -11,6 +11,7 @@ import com.ecommerce.ecommerce.Repository.CartRepository;
 import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.CartService;
+import com.ecommerce.ecommerce.util.ImageUrls;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -64,8 +65,9 @@ public class CartServiceImpl implements CartService {
                         cartItem.getProduct().getDescription(),
                         cartItem.getProduct().getPrice(),
                         cartItem.getQuantity(),
-                        cartItem.getProduct().getImageUrl(),
-                        cartItem.getProduct().getQuantity()
+                        ImageUrls.hero(cartItem.getProduct().getImageUrl(), cartItem.getProduct().getImageUrls()),
+                        cartItem.getProduct().getQuantity(),
+                        cartItem.getSize()
                 ))
                 .toList();
         return new CartResponseDTO(
@@ -79,7 +81,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addToCart(String email,
                           Long productId,
-                          Integer quantity){
+                          Integer quantity,
+                          String size){
 
         System.out.println("Email: " + email);
         System.out.println("ProductId: " + productId);
@@ -101,19 +104,37 @@ public class CartServiceImpl implements CartService {
                         new RuntimeException("product not found"));
         System.out.println("Product found");
 
+        // Clothing needs a valid size; other products never have one.
+        String chosenSize = size == null || size.isBlank() ? null : size.trim();
+        if (product.getSizes() != null && !product.getSizes().isBlank()) {
+            if (chosenSize == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please select a size");
+            }
+            if (!List.of(product.getSizes().split(",")).contains(chosenSize)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Size " + chosenSize + " is not available");
+            }
+        } else {
+            chosenSize = null;
+        }
+
+        // Stock is per product, so count every size of this product already in the cart.
+        int alreadyInCart = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .mapToInt(CartItem::getQuantity)
+                .sum();
+        if (alreadyInCart + quantity > product.getQuantity()) {
+            throw outOfStock(product.getQuantity());
+        }
+
         CartItem existingCartItem =
                 cartItemRepository
-                        .findByCartAndProduct(cart, product)
+                        .findByCartAndProductAndSize(cart, product, chosenSize)
                         .orElse(null);
 
         if (existingCartItem != null) {
 
             int newQuantity =
                     existingCartItem.getQuantity() + quantity;
-
-            if (newQuantity > product.getQuantity()) {
-                throw outOfStock(product.getQuantity());
-            }
 
             existingCartItem.setQuantity(newQuantity);
 
@@ -122,15 +143,12 @@ public class CartServiceImpl implements CartService {
         }
 
 
-        if (quantity > product.getQuantity()) {
-            throw outOfStock(product.getQuantity());
-        }
-
         CartItem cartItem = new CartItem();
 
         cartItem.setCart(cart);
         cartItem.setProduct(product);
         cartItem.setQuantity(quantity);
+        cartItem.setSize(chosenSize);
 
         cartItemRepository.save(cartItem);
     }

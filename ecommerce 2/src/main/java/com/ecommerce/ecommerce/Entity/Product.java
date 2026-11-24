@@ -29,4 +29,22 @@ public class Product {
     private String distributor;
     private String warranty;
     private String specifications;
+
+    // Original price before discount (shown struck through). Null = no discount.
+    private BigDecimal mrp;
+
+    // Gallery images, "|" separated. imageUrl stays as the single/hero image for old clients.
+    @Column(length = 4000)
+    private String imageUrls;
+
+    // Clothing: "S,M,L,XL" and a JSON size chart {"columns":[...],"rows":[[...]]}
+    @Column(length = 500)
+    private String sizes;
+
+    @Column(length = 4000)
+    private String sizeChart;
+
+    // Campaign tags, "," separated: sale50, clearance, festive
+    @Column(length = 200)
+    private String offers;
 }

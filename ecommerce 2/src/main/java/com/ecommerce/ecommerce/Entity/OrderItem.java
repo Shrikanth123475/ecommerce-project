@@ -24,6 +24,8 @@ public class OrderItem {
 
     private BigDecimal price;
 
+    private String size;
+
     @ManyToOne
     @JoinColumn(name="product_id")
     private Product product;

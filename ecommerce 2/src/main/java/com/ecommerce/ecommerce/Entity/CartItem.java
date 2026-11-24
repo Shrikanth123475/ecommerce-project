@@ -27,4 +27,7 @@ public class CartItem {
     private Product product;
 
     private Integer quantity;
+
+    // Selected size for clothing (null for products without sizes)
+    private String size;
 }

@@ -32,7 +32,8 @@ public class CartController {
         cartService.addToCart(
                 principal.getName(),
                 cartDTO.getProductId(),
-                cartDTO.getQuantity()
+                cartDTO.getQuantity(),
+                cartDTO.getSize()
         );
 
         return "Product added to cart successfully";

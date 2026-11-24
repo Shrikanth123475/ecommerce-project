@@ -8,6 +8,7 @@ import com.ecommerce.ecommerce.Repository.CartRepository;
 import com.ecommerce.ecommerce.Repository.OrderRepository;
 import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.OrderService;
+import com.ecommerce.ecommerce.util.ImageUrls;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             orderItem.setProduct(product);
             orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setSize(cartItem.getSize());
 
             BigDecimal price = product.getPrice();
             orderItem.setPrice(price);
@@ -178,7 +180,8 @@ public class OrderServiceImpl implements OrderService {
                         item.getProduct().getDescription(),
                         item.getPrice(),
                         item.getQuantity(),
-                        item.getProduct().getImageUrl()
+                        ImageUrls.hero(item.getProduct().getImageUrl(), item.getProduct().getImageUrls()),
+                        item.getSize()
                 ))
                 .toList();
 
