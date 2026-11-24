@@ -28,9 +28,23 @@ export function DialogProvider({ children }: { children: ReactNode }) {
         <Pressable style={styles.backdrop} onPress={() => (dialog?.confirmLabel ? close(false) : close(true))}>
           {/* inner Pressable swallows taps so touching the card doesn't dismiss it */}
           <Pressable style={styles.card} onPress={() => {}}>
-            <View style={[styles.iconBubble, dialog?.tone === "danger" ? styles.iconDanger : styles.iconInfo]}>
-              <Text style={[styles.icon, dialog?.tone === "danger" ? styles.iconDangerText : styles.iconInfoText]}>
-                {dialog?.tone === "danger" ? "!" : "i"}
+            <View
+              style={[
+                styles.iconBubble,
+                dialog?.tone === "danger" ? styles.iconDanger : dialog?.tone === "success" ? styles.iconSuccess : styles.iconInfo,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.icon,
+                  dialog?.tone === "danger"
+                    ? styles.iconDangerText
+                    : dialog?.tone === "success"
+                      ? styles.iconSuccessText
+                      : styles.iconInfoText,
+                ]}
+              >
+                {dialog?.tone === "danger" ? "!" : dialog?.tone === "success" ? "✓" : "i"}
               </Text>
             </View>
             <Text style={styles.title}>{dialog?.title}</Text>
@@ -42,10 +56,15 @@ export function DialogProvider({ children }: { children: ReactNode }) {
                     <Text style={styles.secondaryText}>{dialog.cancelLabel}</Text>
                   </Pressable>
                   <Pressable
-                    style={[styles.button, dialog.tone === "danger" ? styles.danger : styles.primary]}
+                    style={[
+                      styles.button,
+                      dialog.tone === "danger" ? styles.danger : dialog.tone === "success" ? styles.lime : styles.primary,
+                    ]}
                     onPress={() => close(true)}
                   >
-                    <Text style={styles.primaryText}>{dialog.confirmLabel}</Text>
+                    <Text style={[styles.primaryText, dialog.tone === "success" && styles.limeText]}>
+                      {dialog.confirmLabel}
+                    </Text>
                   </Pressable>
                 </>
               ) : (
@@ -77,8 +96,12 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   iconBubble: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center", marginBottom: 14 },
-  iconInfo: { backgroundColor: "#E3EEFF" },
+  iconInfo: { backgroundColor: "#ECFCCB" },
   iconDanger: { backgroundColor: "#FDECEA" },
+  iconSuccess: { backgroundColor: "#ECFCCB" },
+  iconSuccessText: { color: "#3F6212" },
+  lime: { backgroundColor: Brand.accent },
+  limeText: { color: Brand.onAccent },
   icon: { fontSize: 26, fontWeight: "800" },
   iconInfoText: { color: Brand.primary },
   iconDangerText: { color: Brand.error },

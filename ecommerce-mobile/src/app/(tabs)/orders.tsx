@@ -11,8 +11,12 @@ import { getErrorMessage } from "@/services/api";
 import { getOrders, type Order } from "@/services/orderService";
 import { formatDate, formatPrice } from "@/utils/format";
 
+const PAGE_SIZE = 5;
+
 export default function OrdersScreen() {
   const router = useRouter();
+  const listRef = useRef<FlatList<Order>>(null);
+  const [page, setPage] = useState(1);
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,9 +58,19 @@ export default function OrdersScreen() {
         </View>
       );
     }
+    // The backend returns newest first. Show 5 per page.
+    const pageCount = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
+    const current = Math.min(page, pageCount);
+    const pageOrders = orders.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+    const goTo = (next: number) => {
+      setPage(next);
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    };
+
     return (
       <FlatList
-        data={orders}
+        ref={listRef}
+        data={pageOrders}
         keyExtractor={(order) => String(order.orderId)}
         contentContainerStyle={orders.length ? styles.list : styles.emptyList}
         refreshing={refreshing}
@@ -83,12 +97,47 @@ export default function OrdersScreen() {
                 {extra > 0 ? <Text style={styles.extra}>+{extra} more</Text> : null}
               </View>
               <Text style={styles.names} numberOfLines={2}>
-                {order.items.map((item) => `${item.productName} × ${item.quantity}`).join(", ")}
+                {order.items.map((item) => `${item.productName}${item.size ? ` (${item.size})` : ""} × ${item.quantity}`).join(", ")}
               </Text>
               <Text style={styles.total}>{formatPrice(order.totalAmount)}</Text>
             </Pressable>
           );
         }}
+        ListFooterComponent={
+          pageCount > 1 ? (
+            <View style={styles.pager}>
+              <Text style={styles.pagerInfo}>
+                Showing {(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, orders.length)} of {orders.length} orders
+              </Text>
+              <View style={styles.pagerRow}>
+                <Pressable
+                  style={[styles.pagerButton, current === 1 && styles.pagerDisabled]}
+                  disabled={current === 1}
+                  onPress={() => goTo(current - 1)}
+                >
+                  <Text style={styles.pagerButtonText}>‹ Prev</Text>
+                </Pressable>
+                {Array.from({ length: pageCount }, (_, i) => i + 1)
+                  .filter((n) => n === 1 || n === pageCount || Math.abs(n - current) <= 1)
+                  .map((n, index, all) => (
+                    <View key={n} style={styles.pagerRow}>
+                      {index > 0 && n - all[index - 1] > 1 ? <Text style={styles.pagerDots}>…</Text> : null}
+                      <Pressable style={[styles.pageNumber, n === current && styles.pageNumberActive]} onPress={() => goTo(n)}>
+                        <Text style={[styles.pageNumberText, n === current && styles.pageNumberTextActive]}>{n}</Text>
+                      </Pressable>
+                    </View>
+                  ))}
+                <Pressable
+                  style={[styles.pagerButton, current === pageCount && styles.pagerDisabled]}
+                  disabled={current === pageCount}
+                  onPress={() => goTo(current + 1)}
+                >
+                  <Text style={styles.pagerButtonText}>Next ›</Text>
+                </Pressable>
+              </View>
+            </View>
+          ) : undefined
+        }
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>No orders yet</Text>
@@ -120,6 +169,17 @@ const styles = StyleSheet.create({
   message: { color: "#60646C", fontSize: 15, textAlign: "center" },
   retry: { marginTop: 16, alignSelf: "stretch" },
   list: { padding: 12, gap: 10 },
+  pager: { alignItems: "center", gap: 10, paddingTop: 8, paddingBottom: 16 },
+  pagerInfo: { fontSize: 12, color: "#71717A" },
+  pagerRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  pagerButton: { paddingHorizontal: 14, height: 36, borderRadius: 18, backgroundColor: "#fff", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: Brand.border },
+  pagerDisabled: { opacity: 0.4 },
+  pagerButtonText: { fontSize: 13, fontWeight: "700", color: "#18181B" },
+  pagerDots: { color: "#71717A", marginHorizontal: 2 },
+  pageNumber: { minWidth: 36, height: 36, borderRadius: 18, backgroundColor: "#fff", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: Brand.border },
+  pageNumberActive: { backgroundColor: Brand.accent, borderColor: Brand.accent },
+  pageNumberText: { fontSize: 13, fontWeight: "700", color: "#18181B" },
+  pageNumberTextActive: { color: Brand.onAccent },
   emptyList: { flexGrow: 1 },
   empty: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, gap: 6 },
   emptyTitle: { fontSize: 18, fontWeight: "700", color: "#212121" },

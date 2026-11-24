@@ -9,6 +9,7 @@ export type CartItem = {
   quantity: number;
   imageUrl: string | null;
   stock: number;
+  size: string | null;
 };
 
 export type Cart = {
@@ -22,8 +23,8 @@ export async function getCart() {
   return data;
 }
 
-export async function addToCart(productId: number, quantity = 1) {
-  await api.post("/cart/add", { productId, quantity });
+export async function addToCart(productId: number, quantity = 1, size?: string | null) {
+  await api.post("/cart/add", { productId, quantity, size: size ?? null });
 }
 
 export async function incrementItem(cartItemId: number) {

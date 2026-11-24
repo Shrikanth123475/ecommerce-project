@@ -7,6 +7,7 @@ import { TextField } from "@/components/TextField";
 import { Brand } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/services/api";
+import { PAGE_MAX_WIDTH } from "@/hooks/use-responsive";
 
 const GENDERS = ["Male", "Female", "Other"];
 
@@ -151,7 +152,7 @@ export default function EditProfile() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: "#F1F3F6" },
-  content: { padding: 12, gap: 10, paddingBottom: 40 },
+  content: { maxWidth: PAGE_MAX_WIDTH, width: "100%", alignSelf: "center", padding: 12, gap: 10, paddingBottom: 40 },
   card: { backgroundColor: "#fff", borderRadius: 8, padding: 14 },
   section: { fontSize: 15, fontWeight: "700", color: "#212121", marginBottom: 14 },
   label: { fontSize: 13, color: "#60646C", marginBottom: 6, fontWeight: "600" },
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     borderColor: Brand.border,
     backgroundColor: "#fff",
   },
-  chipActive: { backgroundColor: "#E3EEFF", borderColor: Brand.primary },
+  chipActive: { backgroundColor: "#ECFCCB", borderColor: Brand.primary },
   chipText: { fontSize: 14, color: "#212121" },
   chipTextActive: { color: Brand.primary, fontWeight: "700" },
   formError: { color: Brand.error, fontSize: 14 },

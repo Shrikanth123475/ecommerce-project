@@ -6,7 +6,7 @@ export type DialogRequest = {
   /** Present for confirmations (two buttons); absent for plain alerts (one button). */
   confirmLabel?: string;
   cancelLabel?: string;
-  tone?: "info" | "danger";
+  tone?: "info" | "danger" | "success";
   resolve: (confirmed: boolean) => void;
 };
 
@@ -25,6 +25,20 @@ export function showAlert(title: string, message: string) {
   }
   if (Platform.OS === "web") window.alert(`${title}\n\n${message}`);
   else Alert.alert(title, message, [{ text: "OK" }]);
+}
+
+/**
+ * Friendly success popup with two choices (e.g. "Continue shopping" / "View order").
+ * Resolves true if the main button was pressed, false for the secondary button or when dismissed.
+ */
+export function showSuccess(title: string, message: string, mainLabel: string, otherLabel: string): Promise<boolean> {
+  if (showDialog) {
+    const open = showDialog;
+    return new Promise((resolve) =>
+      open({ title, message, confirmLabel: mainLabel, cancelLabel: otherLabel, tone: "success", resolve }),
+    );
+  }
+  return confirmAction(title, message, mainLabel, otherLabel);
 }
 
 export function confirmAction(

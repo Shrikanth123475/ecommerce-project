@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 
-const NAVY = "#1E3A8A";
-const BLUE = "#2F6FE4";
+const INK = "#1C1C1E";
+const LIME = "#A3E635";
+const LIME_DARK = "#65A30D";
 
 // ShopEase logo mark drawn with Views (no image): a smiling shopping bag on a rounded badge.
 export function LogoMark({ size = 44 }: { size?: number }) {
@@ -16,7 +17,7 @@ export function LogoMark({ size = 44 }: { size?: number }) {
           height: bagH * 0.6,
           borderWidth: Math.max(2, size * 0.055),
           borderBottomWidth: 0,
-          borderColor: NAVY,
+          borderColor: INK,
           borderTopLeftRadius: handleW / 2,
           borderTopRightRadius: handleW / 2,
           marginBottom: -bagH * 0.22,
@@ -32,7 +33,7 @@ export function LogoMark({ size = 44 }: { size?: number }) {
             width: bagW * 0.5,
             height: bagH * 0.24,
             borderBottomWidth: Math.max(2, size * 0.05),
-            borderColor: "#fff",
+            borderColor: LIME,
             borderBottomLeftRadius: bagW,
             borderBottomRightRadius: bagW,
           }}
@@ -54,11 +55,11 @@ export function Logo({ size = 56, light = false, tagline = false }: { size?: num
     <View style={styles.row}>
       <LogoMark size={size} />
       <View>
-        <Text style={[styles.name, { fontSize: size * 0.62, color: light ? "#fff" : NAVY }]}>
-          Shop<Text style={{ color: light ? "#9CC4FF" : BLUE }}>Ease</Text>
+        <Text style={[styles.name, { fontSize: size * 0.62, color: light ? "#fff" : INK }]}>
+          Shop<Text style={{ color: light ? LIME : LIME_DARK }}>Ease</Text>
         </Text>
         {tagline ? (
-          <Text style={[styles.tagline, { fontSize: Math.max(9, size * 0.16), color: light ? "#DCE8FF" : "#64748B" }]}>
+          <Text style={[styles.tagline, { fontSize: Math.max(9, size * 0.16), color: light ? "#D4D4D8" : "#71717A" }]}>
             SHOPPING MADE SIMPLE
           </Text>
         ) : null}
@@ -74,15 +75,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.12,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
     elevation: 4,
   },
-  bag: { backgroundColor: BLUE, alignItems: "center", justifyContent: "center" },
+  bag: { backgroundColor: INK, alignItems: "center", justifyContent: "center" },
   eyes: { flexDirection: "row" },
-  dot: { borderRadius: 10, backgroundColor: "#fff" },
-  spark: { position: "absolute", backgroundColor: "#38BDF8" },
+  dot: { borderRadius: 10, backgroundColor: LIME },
+  spark: { position: "absolute", backgroundColor: LIME },
   name: { fontWeight: "900", letterSpacing: 0.3 },
   tagline: { fontWeight: "600", letterSpacing: 2, marginTop: 1 },
 });

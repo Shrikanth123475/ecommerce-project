@@ -40,7 +40,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <AuthLayout title="Looks like you're new here!" subtitle="Sign up with your details to get started">
+    <AuthLayout compact title="Create account" subtitle="Sign up with your details to get started">
       <TextField label="Full name" value={name} onChangeText={setName} autoCapitalize="words" error={errors.name} />
       <TextField
         label="Email"
@@ -67,7 +67,7 @@ export default function RegisterScreen() {
         onSubmitEditing={handleRegister}
       />
       {errors.form ? <Text style={styles.formError}>{errors.form}</Text> : null}
-      <PrimaryButton title="Continue" onPress={handleRegister} loading={submitting} />
+      <PrimaryButton title="Create account" onPress={handleRegister} loading={submitting} tone="dark" />
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already a user? </Text>
         <Link href="/login" style={styles.link}>

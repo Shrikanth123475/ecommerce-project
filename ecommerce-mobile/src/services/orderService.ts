@@ -7,6 +7,7 @@ export type OrderItem = {
   price: number;
   quantity: number;
   imageUrl: string | null;
+  size: string | null;
 };
 
 export type Order = {

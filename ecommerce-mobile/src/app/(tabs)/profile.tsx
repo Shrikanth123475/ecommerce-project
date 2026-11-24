@@ -89,9 +89,9 @@ export default function Profile() {
         <View style={styles.tiles}>
           <Tile icon="📦" label={orderCount === null ? "Orders" : `Orders (${orderCount})`} onPress={() => router.navigate("/orders")} />
           <Tile icon="🛒" label="Cart" onPress={() => router.navigate("/cart")} />
-          <Tile icon="✏️" label="Edit profile" onPress={() => router.push("/edit-profile")} />
         </View>
 
+        <View style={styles.stack}>
         {completion < 100 ? (
           <Pressable style={styles.card} onPress={() => router.push("/edit-profile")}>
             <View style={styles.rowBetween}>
@@ -108,9 +108,6 @@ export default function Profile() {
         <View style={styles.card}>
           <View style={styles.rowBetween}>
             <Text style={styles.cardTitle}>Personal information</Text>
-            <Pressable onPress={() => router.push("/edit-profile")} hitSlop={8}>
-              <Text style={styles.edit}>EDIT</Text>
-            </Pressable>
           </View>
           <View style={styles.infoList}>
             <InfoRow label="Full name" value={user?.name} />
@@ -124,9 +121,6 @@ export default function Profile() {
         <View style={styles.card}>
           <View style={styles.rowBetween}>
             <Text style={styles.cardTitle}>Delivery address</Text>
-            <Pressable onPress={() => router.push("/edit-profile")} hitSlop={8}>
-              <Text style={styles.edit}>{user?.address ? "CHANGE" : "ADD"}</Text>
-            </Pressable>
           </View>
           {user?.address ? (
             <View style={styles.infoList}>
@@ -146,6 +140,7 @@ export default function Profile() {
           <View style={styles.divider} />
           <MenuRow icon="🏠" label="Continue shopping" onPress={() => router.navigate("/home")} />
         </View>
+        </View>
 
         <Pressable style={styles.logout} onPress={handleLogout}>
           <Text style={styles.logoutText}>Log out</Text>
@@ -159,12 +154,13 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Brand.primary },
   flex: { flex: 1, backgroundColor: "#F1F3F6" },
   content: { paddingBottom: 32, gap: 10 },
+  stack: { gap: 10 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
     backgroundColor: Brand.primary,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 24,
   },
@@ -172,7 +168,7 @@ const styles = StyleSheet.create({
   avatarText: { color: Brand.primary, fontSize: 26, fontWeight: "800" },
   headerText: { flex: 1 },
   headerName: { color: "#fff", fontSize: 19, fontWeight: "700" },
-  headerEmail: { color: "#DCE8FF", fontSize: 13, marginTop: 2 },
+  headerEmail: { color: "#D4D4D8", fontSize: 13, marginTop: 2 },
   editPill: { borderWidth: 1, borderColor: "#fff", borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6 },
   editPillText: { color: "#fff", fontWeight: "700", fontSize: 13 },
   tiles: { flexDirection: "row", gap: 10, marginHorizontal: 12, marginTop: -18 },
@@ -195,7 +191,7 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   cardTitle: { fontSize: 15, fontWeight: "700", color: "#212121" },
   percent: { fontSize: 14, fontWeight: "700", color: Brand.primary },
-  track: { height: 6, borderRadius: 3, backgroundColor: "#E3EEFF", overflow: "hidden" },
+  track: { height: 6, borderRadius: 3, backgroundColor: "#ECFCCB", overflow: "hidden" },
   fill: { height: 6, backgroundColor: Brand.primary },
   hint: { fontSize: 12, color: "#878787" },
   edit: { color: Brand.primary, fontSize: 13, fontWeight: "700" },

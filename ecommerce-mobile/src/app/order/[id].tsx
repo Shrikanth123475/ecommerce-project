@@ -12,6 +12,7 @@ import { getErrorMessage } from "@/services/api";
 import { cancelOrder, getOrder, type Order } from "@/services/orderService";
 import { confirmAction } from "@/utils/confirm";
 import { formatDate, formatPrice } from "@/utils/format";
+import { PAGE_MAX_WIDTH } from "@/hooks/use-responsive";
 
 export default function OrderDetails() {
   const router = useRouter();
@@ -82,7 +83,10 @@ export default function OrderDetails() {
       {placed === "1" ? (
         <View style={styles.success}>
           <Text style={styles.successTitle}>Order placed successfully!</Text>
-          <Text style={styles.successText}>Thank you for shopping with ShopEase.</Text>
+          <Text style={styles.successText}>Thank you for purchasing from ShopEase.</Text>
+          <Pressable style={styles.keepShopping} onPress={() => router.navigate("/home")}>
+            <Text style={styles.keepShoppingText}>Continue shopping</Text>
+          </Pressable>
         </View>
       ) : null}
 
@@ -109,6 +113,7 @@ export default function OrderDetails() {
               <Text style={styles.itemName} numberOfLines={2}>
                 {item.productName}
               </Text>
+              {item.size ? <Text style={styles.muted}>Size: {item.size}</Text> : null}
               <Text style={styles.muted}>
                 {formatPrice(item.price)} × {item.quantity}
               </Text>
@@ -149,12 +154,14 @@ export default function OrderDetails() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#F1F3F6" },
-  content: { padding: 12, gap: 10, paddingBottom: 32 },
+  content: { maxWidth: PAGE_MAX_WIDTH, width: "100%", alignSelf: "center", padding: 12, gap: 10, paddingBottom: 32 },
   center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
   message: { color: "#60646C", fontSize: 15, textAlign: "center" },
   retry: { marginTop: 16, alignSelf: "stretch" },
   success: { backgroundColor: "#E8F5E9", borderRadius: 8, padding: 14, gap: 2 },
   successTitle: { color: "#2E7D32", fontSize: 16, fontWeight: "700" },
+  keepShopping: { alignSelf: "flex-start", marginTop: 8, backgroundColor: Brand.accent, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8 },
+  keepShoppingText: { color: Brand.onAccent, fontWeight: "800", fontSize: 13 },
   successText: { color: "#388E3C", fontSize: 14 },
   error: { backgroundColor: "#FDECEA", color: Brand.error, padding: 12, borderRadius: 8, fontSize: 14 },
   card: { backgroundColor: "#fff", borderRadius: 8, padding: 14, gap: 10 },

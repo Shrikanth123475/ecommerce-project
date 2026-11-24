@@ -6,6 +6,7 @@ import { Brand } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { DialogProvider } from "@/context/DialogContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -52,7 +53,9 @@ export default function RootLayout() {
     <ToastProvider>
       <DialogProvider>
         <AuthProvider>
-          <RootNavigator />
+          <WishlistProvider>
+            <RootNavigator />
+          </WishlistProvider>
         </AuthProvider>
       </DialogProvider>
     </ToastProvider>

@@ -21,8 +21,9 @@ import {
   type CartItem,
 } from "@/services/cartService";
 import { placeOrder } from "@/services/orderService";
-import { showAlert } from "@/utils/confirm";
+import { showAlert, showSuccess } from "@/utils/confirm";
 import { formatPrice } from "@/utils/format";
+import { useResponsive } from "@/hooks/use-responsive";
 
 export default function CartScreen() {
   const router = useRouter();
@@ -81,7 +82,18 @@ export default function CartScreen() {
     try {
       const order = await placeOrder();
       setCart((current) => (current ? { ...current, items: [] } : current));
-      router.push({ pathname: "/order/[id]", params: { id: String(order.orderId), placed: "1" } });
+      setPlacing(false);
+      const keepShopping = await showSuccess(
+        "Thank you for purchasing!",
+        `Your order #${order.orderNumber} of ${formatPrice(order.totalAmount)} has been placed successfully. You can track it anytime in My Orders.`,
+        "Continue shopping",
+        "View order",
+      );
+      if (keepShopping) {
+        router.navigate("/home");
+      } else {
+        router.push({ pathname: "/order/[id]", params: { id: String(order.orderId), placed: "1" } });
+      }
     } catch (e) {
       if (isStockError(e)) {
         showAlert("Can't place order", getErrorMessage(e));
@@ -95,6 +107,7 @@ export default function CartScreen() {
   };
 
   const items = cart?.items ?? [];
+  const { isDesktop } = useResponsive();
 
   if (loading) {
     return (
@@ -117,103 +130,119 @@ export default function CartScreen() {
     );
   }
 
+  const summaryCard = (
+    <View style={styles.card}>
+      <Text style={styles.sectionTitle}>Price details</Text>
+      <View style={styles.priceRow}>
+        <Text style={styles.priceLabel}>Price ({cartCount(items)} items)</Text>
+        <Text style={styles.priceValue}>{formatPrice(cartTotal(items))}</Text>
+      </View>
+      <View style={styles.priceRow}>
+        <Text style={styles.priceLabel}>Delivery</Text>
+        <Text style={[styles.priceValue, { color: "#388E3C" }]}>Free</Text>
+      </View>
+      <View style={[styles.priceRow, styles.totalRow]}>
+        <Text style={styles.totalLabel}>Total amount</Text>
+        <Text style={styles.totalValue}>{formatPrice(cartTotal(items))}</Text>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.screen} edges={["top"]}>
-      <View style={styles.header}>
+      <View style={[styles.header, isDesktop && { paddingHorizontal: 32 }]}>
         <Text style={styles.title}>My Cart{items.length ? ` (${cartCount(items)})` : ""}</Text>
       </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <FlatList
-        data={items}
-        keyExtractor={(item) => String(item.cartItemId)}
-        contentContainerStyle={items.length ? styles.list : styles.emptyList}
-        refreshing={refreshing}
-        onRefresh={() => load(true)}
-        ListHeaderComponent={
-          items.length ? (
-            <View style={styles.address}>
-              <Text style={styles.addressLabel}>Deliver to</Text>
-              <Text style={styles.addressText}>
-                {user?.name}
-                {user?.address ? `, ${user.address}` : " (no address saved)"}
-              </Text>
-            </View>
-          ) : undefined
-        }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Pressable
-              style={styles.row}
-              onPress={() => router.push({ pathname: "/product/[id]", params: { id: String(item.productId) } })}
-            >
-              <ItemThumb uri={item.imageUrl} />
-              <View style={styles.info}>
-                <Text style={styles.name} numberOfLines={2}>
-                  {item.productName}
-                </Text>
-                <Text style={styles.price}>{formatPrice(item.price)}</Text>
-                {item.stock <= 0 ? (
-                  <Text style={[styles.stock, { color: Brand.error }]}>Out of stock</Text>
-                ) : item.quantity >= item.stock ? (
-                  <Text style={[styles.stock, { color: Brand.accent }]}>Only {item.stock} in stock – max reached</Text>
-                ) : item.stock <= 5 ? (
-                  <Text style={[styles.stock, { color: Brand.accent }]}>Only {item.stock} left</Text>
-                ) : null}
+      <View style={styles.mobileCol}>
+        <View style={styles.listCol}>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => String(item.cartItemId)}
+            contentContainerStyle={items.length ? styles.list : styles.emptyList}
+            refreshing={refreshing}
+            onRefresh={() => load(true)}
+            ListHeaderComponent={
+              items.length ? (
+                <View style={styles.address}>
+                  <Text style={styles.addressLabel}>Deliver to</Text>
+                  <Text style={styles.addressText}>
+                    {user?.name}
+                    {user?.address ? `, ${user.address}` : " (no address saved)"}
+                  </Text>
+                </View>
+              ) : undefined
+            }
+            renderItem={({ item }) => (
+              <View style={styles.card}>
+                <Pressable
+                  style={styles.row}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/product/[id]",
+                      params: { id: String(item.productId) },
+                    })
+                  }
+                >
+                  <ItemThumb uri={item.imageUrl} />
+                  <View style={styles.info}>
+                    <Text style={styles.name} numberOfLines={2}>
+                      {item.productName}
+                    </Text>
+                    {item.size ? <Text style={styles.sizeLine}>Size: {item.size}</Text> : null}
+                  <Text style={styles.price}>{formatPrice(item.price)}</Text>
+                    {item.stock <= 0 ? (
+                      <Text style={[styles.stock, { color: Brand.error }]}>Out of stock</Text>
+                    ) : item.quantity >= item.stock ? (
+                      <Text style={[styles.stock, { color: Brand.warning }]}>
+                        Only {item.stock} in stock – max reached
+                      </Text>
+                    ) : item.stock <= 5 ? (
+                      <Text style={[styles.stock, { color: Brand.warning }]}>Only {item.stock} left</Text>
+                    ) : null}
+                  </View>
+                </Pressable>
+                <View style={styles.actions}>
+                  <QuantityStepper
+                    quantity={item.quantity}
+                    disabled={busyId === item.cartItemId}
+                    onIncrement={() =>
+                      item.quantity >= item.stock
+                        ? showAlert(
+                            item.stock <= 0 ? "Out of stock" : "Limited stock",
+                            item.stock <= 0
+                              ? `${item.productName} is out of stock right now.`
+                              : `Only ${item.stock} unit(s) of ${item.productName} available. You already have ${item.quantity} in your cart.`,
+                          )
+                        : change(item, incrementItem)
+                    }
+                    onDecrement={() => change(item, decrementItem, item.quantity === 1)}
+                  />
+                  <Pressable
+                    onPress={() => change(item, removeItem, true)}
+                    disabled={busyId === item.cartItemId}
+                    hitSlop={8}
+                  >
+                    <Text style={styles.remove}>REMOVE</Text>
+                  </Pressable>
+                </View>
               </View>
-            </Pressable>
-            <View style={styles.actions}>
-              <QuantityStepper
-                quantity={item.quantity}
-                disabled={busyId === item.cartItemId}
-                onIncrement={() =>
-                  item.quantity >= item.stock
-                    ? showAlert(
-                        item.stock <= 0 ? "Out of stock" : "Limited stock",
-                        item.stock <= 0
-                          ? `${item.productName} is out of stock right now.`
-                          : `Only ${item.stock} unit(s) of ${item.productName} available. You already have ${item.quantity} in your cart.`,
-                      )
-                    : change(item, incrementItem)
-                }
-                onDecrement={() => change(item, decrementItem, item.quantity === 1)}
-              />
-              <Pressable onPress={() => change(item, removeItem, true)} disabled={busyId === item.cartItemId} hitSlop={8}>
-                <Text style={styles.remove}>REMOVE</Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
-        ListFooterComponent={
-          items.length ? (
-            <View style={styles.card}>
-              <Text style={styles.sectionTitle}>Price details</Text>
-              <View style={styles.priceRow}>
-                <Text style={styles.priceLabel}>Price ({cartCount(items)} items)</Text>
-                <Text style={styles.priceValue}>{formatPrice(cartTotal(items))}</Text>
+            )}
+            ListFooterComponent={items.length ? summaryCard : undefined}
+            ListEmptyComponent={
+              <View style={styles.empty}>
+                <Text style={styles.emptyTitle}>Your cart is empty</Text>
+                <Text style={styles.message}>Add items to it now.</Text>
+                <View style={styles.retry}>
+                  <PrimaryButton title="Shop now" onPress={() => router.navigate("/home")} />
+                </View>
               </View>
-              <View style={styles.priceRow}>
-                <Text style={styles.priceLabel}>Delivery</Text>
-                <Text style={[styles.priceValue, { color: "#388E3C" }]}>Free</Text>
-              </View>
-              <View style={[styles.priceRow, styles.totalRow]}>
-                <Text style={styles.totalLabel}>Total amount</Text>
-                <Text style={styles.totalValue}>{formatPrice(cartTotal(items))}</Text>
-              </View>
-            </View>
-          ) : undefined
-        }
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>Your cart is empty</Text>
-            <Text style={styles.message}>Add items to it now.</Text>
-            <View style={styles.retry}>
-              <PrimaryButton title="Shop now" onPress={() => router.navigate("/home")} />
-            </View>
-          </View>
-        }
-      />
+            }
+          />
+        </View>
+      </View>
 
       {items.length ? (
         <View style={styles.footer}>
@@ -232,15 +261,37 @@ export default function CartScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#F1F3F6" },
-  header: { backgroundColor: Brand.primary, paddingHorizontal: 16, paddingVertical: 14 },
+  header: {
+    backgroundColor: Brand.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
   title: { color: "#fff", fontSize: 18, fontWeight: "700" },
-  error: { backgroundColor: "#FDECEA", color: Brand.error, padding: 12, fontSize: 14 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
+  error: {
+    backgroundColor: "#FDECEA",
+    color: Brand.error,
+    padding: 12,
+    fontSize: 14,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
   message: { color: "#60646C", fontSize: 15, textAlign: "center" },
   retry: { marginTop: 16, alignSelf: "stretch" },
   list: { padding: 12, gap: 10 },
+  mobileCol: { flex: 1 },
+  listCol: { flex: 1, alignSelf: "stretch" },
   emptyList: { flexGrow: 1 },
-  empty: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, gap: 6 },
+  empty: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+    gap: 6,
+  },
   emptyTitle: { fontSize: 18, fontWeight: "700", color: "#212121" },
   address: { backgroundColor: "#fff", borderRadius: 8, padding: 12 },
   addressLabel: { fontSize: 12, color: "#878787", marginBottom: 2 },
@@ -251,7 +302,12 @@ const styles = StyleSheet.create({
   name: { fontSize: 15, color: "#212121" },
   price: { fontSize: 17, fontWeight: "700", color: "#212121" },
   stock: { fontSize: 12, fontWeight: "600" },
-  actions: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  sizeLine: { fontSize: 13, color: "#60646C" },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   remove: { color: "#60646C", fontSize: 13, fontWeight: "700" },
   sectionTitle: { fontSize: 14, color: "#878787", fontWeight: "700" },
   priceRow: { flexDirection: "row", justifyContent: "space-between" },

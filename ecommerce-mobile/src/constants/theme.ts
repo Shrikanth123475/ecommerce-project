@@ -65,8 +65,11 @@ export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
 
 export const Brand = {
-  primary: '#2874F0',
-  accent: '#FB641B',
+  primary: '#1C1C1E', // near-black: headers, selected chips, main text accents
+  accent: '#A3E635', // lime: primary buttons, active tab, highlights
+  onAccent: '#1C1C1E', // text on top of lime
+  warning: '#E65100', // low-stock notes
   error: '#D32F2F',
-  border: '#D9DCE3',
+  border: '#E4E4E7',
+  surface: '#F4F4F5', // light grey cards / inputs
 } as const;
