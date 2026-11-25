@@ -134,9 +134,20 @@ The database starts **empty** (no users, no orders), so register first.
 
 ## Notes
 
-- The database files (`data/*.db`) are **not** in git. The first start creates a
-  fresh local database, so data does not sync between machines and there are no
-  shared logins. Register your own account.
+- The demo database **is in git**: `data/ecommerce_db.mv.db` holds the product
+  catalog, the demo merchant account and some sample users and orders, so
+  everyone starts with the same data. (`data/*.trace.db` is only a log and is
+  ignored.)
+- Log in as the merchant with the email and password from the
+  `merchant.email` / `merchant.password` lines in step 3, or register your own
+  account. Other sample users' passwords are not shared.
+- Your own orders and new users change that file on **your** machine. To stop git
+  showing it as modified (and to avoid committing your changes by accident), run
+  once after cloning: `git update-index --assume-unchanged data/ecommerce_db.mv.db`
+- Stop the backend before `git pull` or switching branches. Git replaces the file
+  and the running backend would keep using the old one.
+- To start again from the shared data, stop the backend and run
+  `git checkout data/ecommerce_db.mv.db`.
 - Passwords are stored as BCrypt hashes (max 72 characters). If you have a
   database from before this change, the backend upgrades its plain-text
   passwords to hashes automatically at startup; logins keep working.
