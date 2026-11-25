@@ -156,6 +156,7 @@ User user = userRepository.findByEmail(email)
                 .dateOfBirth(user.getDateOfBirth())
                 .city(user.getCity())
                 .pincode(user.getPincode())
+                .role("MERCHANT".equals(user.getRole()) ? "MERCHANT" : "CUSTOMER")
                 .build();
     }
 }

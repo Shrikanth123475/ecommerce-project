@@ -49,6 +49,15 @@ server.error.include-message=always
 jwt.secret=change-me-to-a-long-random-string-of-32-plus-chars
 ```
 
+Optional: to get a **merchant** account (the only role allowed to add, edit or
+delete products through the API), add two more lines. The account is created on
+startup. Nobody can become a merchant by registering.
+
+```properties
+merchant.email=merchant@shopease.com
+merchant.password=choose-a-password
+```
+
 ## 4. Start the backend
 
 Run from the **project root** (the folder that contains `data/`):
