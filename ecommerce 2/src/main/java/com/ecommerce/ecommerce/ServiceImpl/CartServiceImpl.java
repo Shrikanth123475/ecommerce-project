@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.ecommerce.ecommerce.DTO.CartItemResponseDTO;
 import com.ecommerce.ecommerce.DTO.CartResponseDTO;
 import com.ecommerce.ecommerce.Entity.Cart;
@@ -50,11 +51,11 @@ public class CartServiceImpl implements CartService {
     public CartResponseDTO getCartByEmail(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(()->
-                        new RuntimeException("Cart not found "));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
 
         List<CartItemResponseDTO> items=cart.getCartItems()
                 .stream()
@@ -78,31 +79,26 @@ public class CartServiceImpl implements CartService {
 
     }
 
+    @Transactional
     @Override
     public void addToCart(String email,
                           Long productId,
                           Integer quantity,
                           String size){
 
-        System.out.println("Email: " + email);
-        System.out.println("ProductId: " + productId);
-        System.out.println("Quantity: " + quantity);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
-        System.out.println("User found");
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Cart cart=cartRepository.findByUser(user)
                 .orElseThrow(()->
-                        new RuntimeException("Cart not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
 
-        System.out.println("Cart found");
 
         Product product =productRepository.findById(productId)
                 .orElseThrow(()->
-                        new RuntimeException("product not found"));
-        System.out.println("Product found");
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "product not found"));
 
         // Clothing needs a valid size; other products never have one.
         String chosenSize = size == null || size.isBlank() ? null : size.trim();
@@ -154,11 +150,19 @@ public class CartServiceImpl implements CartService {
     }
 
 
+    @Transactional
     @Override
-    public void removeFromCart(Long cartItemId){
-        CartItem cartItem=cartItemRepository.findById(cartItemId)
-                .orElseThrow(()->
-                        new RuntimeException("CartItem not found "));
+    public void removeFromCart(Long cartItemId, String email) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "CartItem not found"));
+
+        if (!cartItem.getCart().getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You cannot delete another user's cart item"
+            );
+        }
 
         cartItemRepository.delete(cartItem);
     }

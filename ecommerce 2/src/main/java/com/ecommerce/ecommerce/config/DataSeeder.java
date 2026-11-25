@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.config;
 
+import lombok.extern.slf4j.Slf4j;
 import com.ecommerce.ecommerce.Entity.Product;
 import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,6 +28,7 @@ import java.util.stream.StreamSupport;
  *   first time, i.e. while they have no gallery images yet - so later edits are never overwritten.
  * - Gallery images are discovered from src/main/resources/static/product-images/<slug>-1.jpg, -2.jpg ...
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -88,7 +90,7 @@ public class DataSeeder implements CommandLineRunner {
             productRepository.save(product);
             if (isNew) created++; else updated++;
         }
-        System.out.println("DataSeeder: " + created + " products created, " + updated + " updated");
+        log.info("DataSeeder: {} products created, {} updated", created, updated);
     }
 
     private void apply(Product p, JsonNode n, List<String> images) {

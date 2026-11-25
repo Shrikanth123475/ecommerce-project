@@ -57,8 +57,6 @@ public UserServiceImpl (
 @Override
     public AuthResponseDTO login (LoginDTO loginDTO){
 
-    System.out.println("Login request received");
-    System.out.println("Email: " + loginDTO.getEmail());
 
     User user = userRepository.findByEmail(
             loginDTO.getEmail()
@@ -95,9 +93,7 @@ public UserServiceImpl (
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "User not found"
-                        ));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         user.setName(userDTO.getName());
         user.setAddress(userDTO.getAddress());
@@ -115,12 +111,10 @@ public UserServiceImpl (
 @Override
     public void deleteUserByEmail(String email){
 
-    System.out.println("Deleting user: " + email);
 
 User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->new RuntimeException("User not found"));
+                .orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-    System.out.println("User exists");
 
 
     userRepository.delete(user);
@@ -133,9 +127,7 @@ User user = userRepository.findByEmail(email)
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "User not found"
-                        ));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return toResponse(user);
     }

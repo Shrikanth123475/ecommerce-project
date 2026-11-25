@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import com.ecommerce.ecommerce.DTO.OrderItemDTO;
 import com.ecommerce.ecommerce.Entity.OrderItem;
 import com.ecommerce.ecommerce.Repository.OrderItemRepository;
@@ -41,7 +43,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     public OrderItemDTO getOrderItemById(Long id) {
 
         OrderItem orderItem = orderItemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order Item Not Found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order Item Not Found"));
 
         return mapToDTO(orderItem);
     }
@@ -50,7 +52,7 @@ public class OrderItemServiceImpl implements OrderItemService {
                                         OrderItemDTO orderItemDTO) {
 
         OrderItem orderItem = orderItemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order Item Not Found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order Item Not Found"));
 
         orderItem.setQuantity(orderItemDTO.getQuantity());
         orderItem.setPrice(orderItemDTO.getPrice());

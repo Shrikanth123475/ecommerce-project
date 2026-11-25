@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.ecommerce.ecommerce.Entity.Cart;
 import com.ecommerce.ecommerce.Entity.CartItem;
 import com.ecommerce.ecommerce.Repository.CartItemRepository;
@@ -43,17 +44,18 @@ public class CartItemServiceImpl implements CartItemService {
 
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() ->
-                        new RuntimeException("Cart  not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart  not found"));
 
         return cartItemRepository.findByCart(cart);
     }
+    @Transactional
     @Override
     public void removeCartItem(Long cartItemId,String email) {
 
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException("Cart Item not found"));
+                                new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart Item not found"));
 
         String ownerEmail=cartItem
                 .getCart()
@@ -70,6 +72,7 @@ public class CartItemServiceImpl implements CartItemService {
         cartItemRepository.delete(cartItem);
     }
 
+    @Transactional
     @Override
     public CartItem updateQuantity(
             Long cartItemId,
@@ -78,8 +81,7 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Cart Item not found"));
+                                new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart Item not found"));
 
         int productStock =
                 cartItem.getProduct().getQuantity();
@@ -94,6 +96,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
 
+    @Transactional
     @Override
     public CartItem incrementQuantity(
             Long cartItemId,
@@ -102,8 +105,7 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Cart Item not found"));
+                                new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart Item not found"));
 
         String ownerEmail =
                 cartItem.getCart()
@@ -134,6 +136,7 @@ public class CartItemServiceImpl implements CartItemService {
                 cartItem.getQuantity() + 1
         );
     }
+    @Transactional
     @Override
     public CartItem decrementQuantity(
             Long cartItemId,
@@ -142,8 +145,7 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem =
                 cartItemRepository.findById(cartItemId)
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Cart Item not found"));
+                                new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart Item not found"));
 
         String ownerEmail =
                 cartItem.getCart()

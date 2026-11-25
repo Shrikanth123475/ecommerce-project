@@ -1,5 +1,9 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import java.util.Comparator;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.EntityManager;
+import org.springframework.transaction.annotation.Transactional;
 import com.ecommerce.ecommerce.DTO.OrderItemResponseDTO;
 import com.ecommerce.ecommerce.DTO.OrderResponseDTO;
 import com.ecommerce.ecommerce.Entity.*;
@@ -29,28 +33,36 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final EntityManager entityManager;
 
+    // One transaction: if any item fails, nothing (stock, order, cart) is changed.
+    @Transactional
     @Override
     public OrderResponseDTO placeOrder(String email) {
-        System.out.println("Email = " + email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException(" User not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() ->
-                        new RuntimeException("Cart not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
 
         if (cart.getCartItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cart is empty");
         }
 
-        System.out.println("Proceeding to create order");
 
         Order order = new Order();
         order.setUser(user);
         order.setStatus("PLACED");
         order.setOrderDate(LocalDateTime.now());
+
+        // Lock every product row until commit, so two buyers can't both take the last unit.
+        cart.getCartItems().stream()
+                .map(CartItem::getProduct)
+                .sorted(Comparator.comparing(Product::getId))
+                .distinct()
+                .forEach(p -> entityManager.refresh(p, LockModeType.PESSIMISTIC_WRITE));
 
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -110,7 +122,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO getOrderById(Long orderId, String email) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new RuntimeException("Order not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 
         if (!order.getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(
@@ -126,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponseDTO> getOrdersByUser(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return orderRepository.findByUserOrderByIdDesc(user)
                 .stream()
@@ -134,6 +146,7 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public OrderResponseDTO cancelOrder(
             Long orderId,
@@ -141,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
     ) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new RuntimeException("Order not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 
         if (!order.getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(
@@ -151,10 +164,19 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if ("CANCELLED".equals(order.getStatus())) {
-            throw new RuntimeException(
-                    "Order already cancelled"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order already cancelled");
         }
+
+        // Lock the order so a double-tap can't restore the stock twice, then lock the products.
+        entityManager.refresh(order, LockModeType.PESSIMISTIC_WRITE);
+        if ("CANCELLED".equals(order.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order already cancelled");
+        }
+        order.getOrderItems().stream()
+                .map(OrderItem::getProduct)
+                .sorted(Comparator.comparing(Product::getId))
+                .distinct()
+                .forEach(p -> entityManager.refresh(p, LockModeType.PESSIMISTIC_WRITE));
 
         for (OrderItem orderItem : order.getOrderItems()) {
             Product product = orderItem.getProduct();

@@ -1,9 +1,0 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-data/
-*.mv.db
-*.trace.db
-target/
-.idea/
-.DS_Store

@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.ServiceImpl;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import com.ecommerce.ecommerce.DTO.ProductDTO;
 import com.ecommerce.ecommerce.Entity.Product;
 import com.ecommerce.ecommerce.Repository.ProductRepository;
@@ -65,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         return mapToDTO(product);
     }
@@ -78,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
