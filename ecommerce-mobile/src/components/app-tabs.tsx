@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CartBadge } from "@/components/CartBadge";
 import { Brand } from "@/constants/theme";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
@@ -37,6 +38,7 @@ function FloatingTabBar({ state, navigateToTab }: TabBarProps) {
             >
               <Ionicons name={focused ? tab.iconActive : tab.icon} size={22} color={focused ? Brand.onAccent : "#52525B"} />
               {focused ? <Text style={styles.label}>{tab.label}</Text> : null}
+              {route.name === "cart" ? <CartBadge /> : null}
             </Pressable>
           );
         })}

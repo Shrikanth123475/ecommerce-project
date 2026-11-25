@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 import { Brand } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 import { DialogProvider } from "@/context/DialogContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { WishlistProvider } from "@/context/WishlistContext";
@@ -53,9 +54,11 @@ export default function RootLayout() {
     <ToastProvider>
       <DialogProvider>
         <AuthProvider>
-          <WishlistProvider>
-            <RootNavigator />
-          </WishlistProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <RootNavigator />
+            </WishlistProvider>
+          </CartProvider>
         </AuthProvider>
       </DialogProvider>
     </ToastProvider>

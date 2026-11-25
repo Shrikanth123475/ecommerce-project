@@ -9,6 +9,7 @@ import { Brand } from "@/constants/theme";
 import { useToast } from "@/context/ToastContext";
 import { getErrorMessage, isStockError } from "@/services/api";
 import { showAlert, showSuccess } from "@/utils/confirm";
+import { useCart } from "@/context/CartContext";
 import { addToCart } from "@/services/cartService";
 import { getProduct, type Product } from "@/services/productService";
 import { formatPrice } from "@/utils/format";
@@ -36,6 +37,7 @@ export default function ProductDetails() {
   const [size, setSize] = useState<string | null>(null);
   const [chartOpen, setChartOpen] = useState(false);
   const router = useRouter();
+  const { refresh: refreshCart } = useCart();
   const toast = useToast();
 
   useEffect(() => {
@@ -87,6 +89,7 @@ export default function ProductDetails() {
     setAdding(true);
     try {
       await addToCart(product.id, 1, size);
+      refreshCart();
       setAdded(true);
       setAdding(false);
       const goToCart = await showSuccess(

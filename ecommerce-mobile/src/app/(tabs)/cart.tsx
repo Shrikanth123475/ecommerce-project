@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,6 +20,7 @@ import {
   type Cart,
   type CartItem,
 } from "@/services/cartService";
+import { useCart } from "@/context/CartContext";
 import { placeOrder } from "@/services/orderService";
 import { showAlert, showSuccess } from "@/utils/confirm";
 import { formatPrice } from "@/utils/format";
@@ -29,7 +30,13 @@ export default function CartScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const toast = useToast();
+  const { setCount: setCartBadge } = useCart();
   const [cart, setCart] = useState<Cart | null>(null);
+
+  // Keep the badge in sync with whatever this screen is showing (add, remove, +/-, order placed).
+  useEffect(() => {
+    if (cart) setCartBadge(cartCount(cart.items));
+  }, [cart, setCartBadge]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);

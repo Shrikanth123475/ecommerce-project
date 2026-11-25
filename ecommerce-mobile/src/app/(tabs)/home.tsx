@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,12 +13,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FilterSheet } from "@/components/FilterSheet";
-import { LogoMark } from "@/components/Logo";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ProductCard } from "@/components/ProductCard";
 import { PromoBanner, type BannerTarget } from "@/components/PromoBanner";
 import { Brand } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
+import { CartBadge } from "@/components/CartBadge";
+import { ScrollRow } from "@/components/ScrollRow";
 import { useResponsive } from "@/hooks/use-responsive";
 import { getErrorMessage } from "@/services/api";
 import { getProducts, type OfferTag, type Product, type SortOption } from "@/services/productService";
@@ -195,9 +195,9 @@ export default function Home() {
               Hey, {firstName}
             </Text>
           </Pressable>
-          <LogoMark size={40} />
           <Pressable style={styles.roundButton} onPress={() => router.navigate("/cart")} accessibilityLabel="Cart">
             <Ionicons name="bag-handle-outline" size={22} color="#18181B" />
+            <CartBadge />
           </Pressable>
         </View>
 
@@ -224,7 +224,7 @@ export default function Home() {
           </Pressable>
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chips, { paddingHorizontal: hPad }]} keyboardShouldPersistTaps="handled">
+        <ScrollRow contentContainerStyle={[styles.chips, { paddingHorizontal: hPad }]}>
           {chips.map((chip) => {
             const active = chip.value === category;
             return (
@@ -236,25 +236,25 @@ export default function Home() {
                   setPriceRange(null);
                   setOffer("");
                   setOfferTitle("");
-                }} style={[styles.chip, active && styles.chipActive]}>
+                }} style={({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => [styles.chip, styles.pointer, active && styles.chipActive, hovered && !active && styles.chipHover, pressed && styles.chipPressed]}>
                 {active ? <Ionicons name="sparkles" size={14} color={Brand.accent} /> : null}
                 <Text style={[styles.chipText, active && styles.chipTextActive]}>{chip.label}</Text>
               </Pressable>
             );
           })}
-        </ScrollView>
+        </ScrollRow>
 
         {category && brands.length > 0 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.brandChips, { paddingHorizontal: hPad }]} keyboardShouldPersistTaps="handled">
+          <ScrollRow contentContainerStyle={[styles.brandChips, { paddingHorizontal: hPad }]}>
             {["", ...brands].map((value) => {
               const active = value === brand;
               return (
-                <Pressable key={value || "all-brands"} onPress={() => setBrand(value)} style={[styles.brandChip, active && styles.brandChipActive]}>
+                <Pressable key={value || "all-brands"} onPress={() => setBrand(value)} style={({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => [styles.brandChip, styles.pointer, active && styles.brandChipActive, hovered && !active && styles.chipHover, pressed && styles.chipPressed]}>
                   <Text style={[styles.brandChipText, active && styles.brandChipTextActive]}>{value || "All brands"}</Text>
                 </Pressable>
               );
             })}
-          </ScrollView>
+          </ScrollRow>
         ) : null}
       </View>
 
@@ -296,6 +296,9 @@ const styles = StyleSheet.create({
   filterBadgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
   chips: { paddingHorizontal: H_PADDING, gap: 10, paddingVertical: 14 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 22, backgroundColor: Brand.surface },
+  pointer: { cursor: "pointer" },
+  chipPressed: { opacity: 0.8, transform: [{ scale: 0.95 }] },
+  chipHover: { backgroundColor: "#E4E4E7" },
   chipActive: { backgroundColor: Brand.primary },
   chipText: { fontSize: 14, color: "#52525B", fontWeight: "600" },
   chipTextActive: { color: "#fff" },

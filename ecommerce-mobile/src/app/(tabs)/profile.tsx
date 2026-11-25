@@ -67,25 +67,25 @@ export default function Profile() {
 
   return (
     <SafeAreaView style={styles.screen} edges={["top"]}>
-      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initial}</Text>
-          </View>
-          <View style={styles.headerText}>
-            <Text style={styles.headerName} numberOfLines={1}>
-              Hi, {user?.name}
-            </Text>
-            <Text style={styles.headerEmail} numberOfLines={1}>
-              {user?.email}
-            </Text>
-            {user?.phone ? <Text style={styles.headerEmail}>+91 {user.phone}</Text> : null}
-          </View>
-          <Pressable style={styles.editPill} onPress={() => router.push("/edit-profile")}>
-            <Text style={styles.editPillText}>Edit</Text>
-          </Pressable>
+      <View style={styles.header}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{initial}</Text>
         </View>
+        <View style={styles.headerText}>
+          <Text style={styles.headerName} numberOfLines={1}>
+            Hi, {user?.name}
+          </Text>
+          <Text style={styles.headerEmail} numberOfLines={1}>
+            {user?.email}
+          </Text>
+          {user?.phone ? <Text style={styles.headerEmail}>+91 {user.phone}</Text> : null}
+        </View>
+        <Pressable style={styles.editPill} onPress={() => router.push("/edit-profile")}>
+          <Text style={styles.editPillText}>Edit</Text>
+        </Pressable>
+      </View>
 
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
         <View style={styles.tiles}>
           <Tile icon="📦" label={orderCount === null ? "Orders" : `Orders (${orderCount})`} onPress={() => router.navigate("/orders")} />
           <Tile icon="🛒" label="Cart" onPress={() => router.navigate("/cart")} />
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   headerEmail: { color: "#D4D4D8", fontSize: 13, marginTop: 2 },
   editPill: { borderWidth: 1, borderColor: "#fff", borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6 },
   editPillText: { color: "#fff", fontWeight: "700", fontSize: 13 },
-  tiles: { flexDirection: "row", gap: 10, marginHorizontal: 12, marginTop: -18 },
+  tiles: { flexDirection: "row", gap: 10, marginHorizontal: 12, marginTop: 14 },
   tile: {
     flex: 1,
     backgroundColor: "#fff",
