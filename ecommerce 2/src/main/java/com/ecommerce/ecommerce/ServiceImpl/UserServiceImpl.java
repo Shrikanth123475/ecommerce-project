@@ -11,6 +11,7 @@ import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.JwtService;
 import com.ecommerce.ecommerce.Service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,15 +20,18 @@ public class UserServiceImpl implements UserService {
 private final UserRepository userRepository;
 private final CartRepository cartRepository;
 private final JwtService jwtService;
+private final PasswordEncoder passwordEncoder;
 
 public UserServiceImpl (
         UserRepository userRepository,
         CartRepository cartRepository,
-        JwtService jwtService
+        JwtService jwtService,
+        PasswordEncoder passwordEncoder
 ){
     this.userRepository=userRepository;
     this.cartRepository=cartRepository;
     this.jwtService=jwtService;
+    this.passwordEncoder=passwordEncoder;
 
 }
 
@@ -39,11 +43,19 @@ public UserServiceImpl (
                 "Email already exists"
         );
     }
+    String password = userDTO.getPassword();
+    if (password == null || password.isBlank()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
+    }
+    // BCrypt only uses the first 72 bytes, so refuse longer ones instead of silently cutting them.
+    if (password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is too long (max 72 characters)");
+    }
     User user = new User();
 
     user.setName(userDTO.getName());
     user.setEmail(userDTO.getEmail());
-    user.setPassword(userDTO.getPassword());
+    user.setPassword(passwordEncoder.encode(password));
     user.setAddress(userDTO.getAddress());
 
     User savedUser = userRepository.save(user);
@@ -67,9 +79,8 @@ public UserServiceImpl (
             )
     );
 
-    if (!user.getPassword().equals(
-            loginDTO.getPassword()
-    )) {
+    if (loginDTO.getPassword() == null
+            || !passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
 
         throw new ResponseStatusException(
                 HttpStatus.UNAUTHORIZED,

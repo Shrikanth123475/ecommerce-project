@@ -21,7 +21,7 @@ phone hotspot for both devices.
 ## 2. Get the code
 
 ```bash
-git clone -b shopease-mobile https://github.com/Shrikanth123475/ecommerce-project.git
+git clone https://github.com/Shrikanth123475/ecommerce-project.git
 cd ecommerce-project
 ```
 
@@ -73,7 +73,8 @@ Check it:
 curl http://localhost:8080/api/products/categories
 ```
 
-Expected: `["Electronics","Laptop","Mobile","Tablet"]`.
+Expected: `["Electronics","Furniture","Laptop","Men","Mobile","Tablet","Watches","Women"]`
+(the product catalog is loaded automatically the first time the backend starts).
 
 > **Important:** the database path is relative (`./data/ecommerce_db`). Starting
 > the backend from any other folder (for example inside `ecommerce 2/`) creates
@@ -91,8 +92,9 @@ npx expo start
 ```
 
 - **Phone:** scan the QR code with Expo Go (Camera app on iPhone).
-- **Browser:** press `w`, or open http://localhost:8081. Use port **8081**; the
-  backend only allows browser requests from that port (and 5173).
+- **Browser:** press `w`, or open the `http://localhost:<port>` address Expo
+  prints (usually 8081; Expo picks the next free port if it is busy). The
+  backend accepts browser requests from any `localhost` port.
   For a phone-sized view press `Cmd+Option+I`, then `Cmd+Shift+M` in Chrome.
 
 The app finds the backend automatically from the Expo server's address
@@ -101,6 +103,8 @@ development. To point at a different backend, copy `.env.example` to
 `.env.local` and set `EXPO_PUBLIC_API_URL`.
 
 ## 6. Try it
+
+The database starts **empty** (no users, no orders), so register first.
 
 1. Register a new account (your own email and password), then log in.
 2. Browse and search products, filter by category and brand, open a product.
@@ -112,7 +116,7 @@ development. To point at a different backend, copy `.env.example` to
 | Problem | Fix |
 |---|---|
 | "Can't reach the server" on the phone | Same Wi-Fi? Open `http://<laptop-ip>:8080/api/products/categories` in the phone browser. If it fails, use a hotspot. Get the IP with `ipconfig getifaddr en0`. |
-| "Can't reach the server" in the browser | Use `http://localhost:8081`, not 8082 (CORS). If 8081 is busy, stop the other Expo process first. |
+| "Can't reach the server" in the browser | Is the backend running (step 4)? Open the app from a `http://localhost:<port>` address (not your laptop's IP). If it still fails, restart the backend so it picks up the latest CORS settings. |
 | "Invalid email or password" and `[]` from the categories call | Backend started from the wrong folder. Stop it and start from the project root (step 4). |
 | `AsyncStorageError: Native module is null` | Keep `@react-native-async-storage/async-storage` at `2.2.0` (the version Expo Go supports): `npx expo install @react-native-async-storage/async-storage`. |
 | Maven fails with `ExceptionInInitializerError ... EndPosTable` | Wrong JDK. Use JDK 21 (see the `JAVA_HOME` in step 4). |
@@ -121,8 +125,12 @@ development. To point at a different backend, copy `.env.example` to
 
 ## Notes
 
-- The `data/*.db` files in git are an **older snapshot**. Each person's backend
-  uses its own local database, so data does not sync between machines.
-- That snapshot contains user emails and **plain-text passwords**. Keep the
-  repository private.
+- The database files (`data/*.db`) are **not** in git. The first start creates a
+  fresh local database, so data does not sync between machines and there are no
+  shared logins. Register your own account.
+- Passwords are stored as BCrypt hashes (max 72 characters). If you have a
+  database from before this change, the backend upgrades its plain-text
+  passwords to hashes automatically at startup; logins keep working.
+- Only one process can open the H2 database file at a time. If the backend says
+  "Database may be already in use", close DBeaver (or any other backend) first.
 - To stop the backend: Ctrl+C, or `pkill -f spring-boot`.
