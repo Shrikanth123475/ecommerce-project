@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce.DTO;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,4 +24,10 @@ public class ProductDTO {
     private String distributor;
     private String warranty;
     private String specifications;
+
+    private BigDecimal mrp;
+    private List<String> images;
+    private List<String> sizes;
+    private String sizeChart;
+    private List<String> offers;
 }

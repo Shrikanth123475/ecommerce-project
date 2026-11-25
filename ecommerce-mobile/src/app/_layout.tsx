@@ -4,6 +4,10 @@ import { useEffect } from "react";
 
 import { Brand } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
+import { DialogProvider } from "@/context/DialogContext";
+import { ToastProvider } from "@/context/ToastContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +34,10 @@ function RootNavigator() {
           options={{ headerShown: true, headerBackTitle: "Back", headerTintColor: Brand.primary }}
         />
         <Stack.Screen
+          name="edit-profile"
+          options={{ headerShown: true, headerBackTitle: "Back", headerTintColor: Brand.primary }}
+        />
+        <Stack.Screen
           name="order/[id]"
           options={{ headerShown: true, headerBackTitle: "Back", headerTintColor: Brand.primary }}
         />
@@ -43,8 +51,16 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <ToastProvider>
+      <DialogProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <RootNavigator />
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </DialogProvider>
+    </ToastProvider>
   );
 }

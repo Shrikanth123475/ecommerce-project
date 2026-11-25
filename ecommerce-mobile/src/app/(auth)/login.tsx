@@ -47,12 +47,13 @@ export default function LoginScreen() {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        autoComplete="password"
+        autoComplete="off"
+        textContentType="none"
         error={errors.password}
         onSubmitEditing={handleLogin}
       />
       {errors.form ? <Text style={styles.formError}>{errors.form}</Text> : null}
-      <PrimaryButton title="Login" onPress={handleLogin} loading={submitting} />
+      <PrimaryButton title="Sign In" onPress={handleLogin} loading={submitting} tone="dark" />
       <View style={styles.footer}>
         <Text style={styles.footerText}>New to ShopEase? </Text>
         <Link href="/register" style={styles.link}>

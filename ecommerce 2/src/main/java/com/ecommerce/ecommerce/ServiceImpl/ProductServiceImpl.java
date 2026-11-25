@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.DTO.ProductDTO;
 import com.ecommerce.ecommerce.Entity.Product;
 import com.ecommerce.ecommerce.Repository.ProductRepository;
 import com.ecommerce.ecommerce.Service.ProductService;
+import com.ecommerce.ecommerce.util.ImageUrls;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,11 @@ public class ProductServiceImpl implements ProductService {
                 .specifications(
                         productDTO.getSpecifications()
                 )
+                .mrp(productDTO.getMrp())
+                .imageUrls(ImageUrls.join(productDTO.getImages(), "|"))
+                .sizes(ImageUrls.join(productDTO.getSizes(), ","))
+                .sizeChart(productDTO.getSizeChart())
+                .offers(ImageUrls.join(productDTO.getOffers(), ","))
 
                 .build();
 
@@ -96,6 +102,11 @@ public class ProductServiceImpl implements ProductService {
         product.setSpecifications(
                 productDTO.getSpecifications()
         );
+        product.setMrp(productDTO.getMrp());
+        product.setImageUrls(ImageUrls.join(productDTO.getImages(), "|"));
+        product.setSizes(ImageUrls.join(productDTO.getSizes(), ","));
+        product.setSizeChart(productDTO.getSizeChart());
+        product.setOffers(ImageUrls.join(productDTO.getOffers(), ","));
         product = productRepository.save(product);
 
         return mapToDTO(product);
@@ -238,6 +249,14 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    private List<String> galleryOf(Product product) {
+        List<String> gallery = ImageUrls.splitAbsolute(product.getImageUrls());
+        if (gallery.isEmpty() && product.getImageUrl() != null && !product.getImageUrl().isBlank()) {
+            return List.of(ImageUrls.absolute(product.getImageUrl()));
+        }
+        return gallery;
+    }
+
     private ProductDTO mapToDTO(Product product) {
 
         return ProductDTO.builder()
@@ -251,8 +270,13 @@ public class ProductServiceImpl implements ProductService {
                         product.getQuantity()
                 )
                 .imageUrl(
-                        product.getImageUrl()
+                        ImageUrls.hero(product.getImageUrl(), product.getImageUrls())
                 )
+                .images(galleryOf(product))
+                .mrp(product.getMrp())
+                .sizes(ImageUrls.split(product.getSizes(), ","))
+                .sizeChart(product.getSizeChart())
+                .offers(ImageUrls.split(product.getOffers(), ","))
                 .category(
                         product.getCategory()
                 )

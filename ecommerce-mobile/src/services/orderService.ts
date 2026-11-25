@@ -7,10 +7,13 @@ export type OrderItem = {
   price: number;
   quantity: number;
   imageUrl: string | null;
+  size: string | null;
 };
 
 export type Order = {
   orderId: number;
+  /** 1, 2, 3... counted per user. orderId is the global database id used in URLs. */
+  orderNumber: number;
   email: string;
   totalAmount: number;
   status: string;

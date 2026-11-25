@@ -13,7 +13,19 @@ export type Product = {
   distributor: string | null;
   warranty: string | null;
   specifications: string | null;
+  /** Original price before discount (null = not discounted). */
+  mrp: number | null;
+  /** Gallery photos (hero first). */
+  images: string[];
+  /** Clothing sizes, e.g. ["S","M","L"] (empty for other products). */
+  sizes: string[];
+  /** JSON string: {"columns": [...], "rows": [[...]]} */
+  sizeChart: string | null;
+  /** Campaign tags: sale50, clearance, festive */
+  offers: string[];
 };
+
+export type OfferTag = "sale50" | "clearance" | "festive";
 
 export type SortOption = "" | "priceLow" | "priceHigh";
 

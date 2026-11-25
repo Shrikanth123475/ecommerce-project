@@ -50,6 +50,12 @@ api.interceptors.response.use(
   },
 );
 
+// The backend answers 409 Conflict when a quantity is more than the available stock.
+// This is NOT an auth problem, so it must never end the session.
+export function isStockError(error: unknown) {
+  return isAxiosError(error) && error.response?.status === 409;
+}
+
 export function getErrorMessage(error: unknown, fallback = "Something went wrong. Please try again.") {
   if (isAxiosError(error)) {
     if (!error.response) {
