@@ -37,9 +37,6 @@ public class SecurityConfig {
                                 "/product-images/**"
                         ).permitAll()
 
-                        // Only an existing merchant can create another merchant account.
-                        .requestMatchers(HttpMethod.POST, "/api/users/register-merchant").hasRole("MERCHANT")
-
                         // Anyone can browse products; only merchants can add, change or delete them.
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                         .requestMatchers("/api/products", "/api/products/**").hasRole("MERCHANT")

@@ -9,7 +9,6 @@ import com.ecommerce.ecommerce.Entity.User;
 public interface UserService {
 
   UserResponseDTO register (UserDTO userDTO);
-  UserResponseDTO registerMerchant (UserDTO userDTO);
   AuthResponseDTO login (LoginDTO loginDTO);
   void deleteUserByEmail(String email);
     UserResponseDTO getProfile(String email);
