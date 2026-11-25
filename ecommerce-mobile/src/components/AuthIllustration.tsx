@@ -3,8 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { LogoMark } from "@/components/Logo";
 import { Brand } from "@/constants/theme";
 
-// Shopping-themed login illustration made from Views: a phone showing a ShopEase login,
-// a happy shopper and a few floating shopping items.
+
 export function AuthIllustration({ scale = 1 }: { scale?: number }) {
   return (
     <View style={{ width: 300 * scale, height: 220 * scale, alignItems: "center", justifyContent: "center" }}>

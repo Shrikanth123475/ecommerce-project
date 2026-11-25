@@ -44,8 +44,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token =
                 authHeader.substring(7);
 
-        String email =
-                jwtService.extractUsername(token);
+        String email;
+        try {
+            email = jwtService.extractUsername(token);
+        } catch (RuntimeException e) {
+            // Expired, malformed or tampered token: treat the request as not logged in instead of
+            // failing with a 500. Public URLs still work, protected ones answer 403.
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (email != null &&
                 SecurityContextHolder
