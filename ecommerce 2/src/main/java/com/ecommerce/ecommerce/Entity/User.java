@@ -35,6 +35,9 @@ public class User {
     private String city;
     private String pincode;
 
+    // "MERCHANT" can manage products; anything else (including null) is a normal customer.
+    private String role;
+
     @OneToOne(mappedBy = "user",
             cascade = CascadeType.ALL,
             orphanRemoval = true)

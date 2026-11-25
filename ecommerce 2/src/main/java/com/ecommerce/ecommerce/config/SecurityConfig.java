@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce.config;
 import com.ecommerce.ecommerce.Security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,10 +34,12 @@ public class SecurityConfig {
                                 "/error",
                                 "/api/users/login",
                                 "/api/users/register",
-                                "/api/products",
-                                "/api/products/**",
                                 "/product-images/**"
                         ).permitAll()
+
+                        // Anyone can browse products; only merchants can add, change or delete them.
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                        .requestMatchers("/api/products", "/api/products/**").hasRole("MERCHANT")
 
                         .anyRequest().authenticated()
                 )

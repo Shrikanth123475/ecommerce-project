@@ -18,5 +18,6 @@ public class UserResponseDTO {
     private String dateOfBirth;
     private String city;
     private String pincode;
+    private String role;
 
 }

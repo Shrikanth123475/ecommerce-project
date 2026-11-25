@@ -5,7 +5,17 @@
     "mrp": 134900,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "MacBook Air M4",
+    "brand": "Apple",
+    "category": "Laptop",
+    "price": 125000,
+    "quantity": 12,
+    "description": "Updated Laptop",
+    "specifications": "24GB RAM, 1TB SSD",
+    "seller": "Apple Premium Store",
+    "distributor": "Appario",
+    "warranty": "2 Years"
   },
   {
     "slug": "macbook-pro-14",
@@ -19,7 +29,11 @@
       "festive"
     ],
     "description": "Powerful 14-inch pro laptop with Liquid Retina XDR display and all-day battery.",
-    "specifications": "M4 Pro chip, 24GB RAM, 512GB SSD, 14.2-inch Liquid Retina XDR"
+    "specifications": "M4 Pro chip, 24GB RAM, 512GB SSD, 14.2-inch Liquid Retina XDR",
+    "quantity": 13,
+    "seller": "Apple Premium Store",
+    "distributor": "Appario",
+    "warranty": "2 Years"
   },
   {
     "slug": "macbook-air-15",
@@ -33,7 +47,11 @@
       "festive"
     ],
     "description": "Thin and light 15-inch laptop with a big, bright display.",
-    "specifications": "M4 chip, 16GB RAM, 512GB SSD, 15.3-inch Liquid Retina"
+    "specifications": "M4 chip, 16GB RAM, 512GB SSD, 15.3-inch Liquid Retina",
+    "quantity": 10,
+    "seller": "Apple Official Store",
+    "distributor": "Appario Retail Pvt Ltd",
+    "warranty": "1 Year Manufacturer Warranty"
   },
   {
     "slug": "dell-xps-15",
@@ -41,7 +59,17 @@
     "mrp": 129990,
     "offers": [
       "clearance"
-    ]
+    ],
+    "name": "Dell XPS 15",
+    "brand": "Dell",
+    "category": "Laptop",
+    "price": 98000,
+    "quantity": 15,
+    "description": "Premium productivity laptop",
+    "specifications": "Intel Core i7, 16GB RAM, 1TB SSD, NVIDIA RTX 4050",
+    "seller": "Dell Exclusive",
+    "distributor": "Dell Technologies India",
+    "warranty": "2 Years Dell Warranty"
   },
   {
     "slug": "samsung-galaxy-s25",
@@ -49,7 +77,17 @@
     "mrp": 94999,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "Samsung Galaxy S25",
+    "brand": "Samsung",
+    "category": "Mobile",
+    "price": 85000,
+    "quantity": 25,
+    "description": "Flagship Samsung smartphone",
+    "specifications": "Snapdragon Processor, 12GB RAM, 256GB Storage, 120Hz Display",
+    "seller": "Samsung India",
+    "distributor": "Samsung Electronics Pvt Ltd",
+    "warranty": "1 Year Device Warranty"
   },
   {
     "slug": "oneplus-14",
@@ -57,7 +95,17 @@
     "mrp": 79999,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "OnePlus 14",
+    "brand": "OnePlus",
+    "category": "Mobile",
+    "price": 62000,
+    "quantity": 20,
+    "description": "Premium Android flagship",
+    "specifications": "12GB RAM, 256GB Storage, 5500mAh Battery, AMOLED Display",
+    "seller": "OnePlus Official",
+    "distributor": "OnePlus India Pvt Ltd",
+    "warranty": "1 Year Manufacturer Warranty"
   },
   {
     "slug": "lenovo-legion-5",
@@ -65,7 +113,17 @@
     "mrp": 119990,
     "offers": [
       "clearance"
-    ]
+    ],
+    "name": "Lenovo Legion 5",
+    "brand": "Lenovo",
+    "category": "Laptop",
+    "price": 89000,
+    "quantity": 15,
+    "description": "Gaming laptop",
+    "specifications": "Ryzen 7, 16GB RAM, RTX 4060, 1TB SSD",
+    "seller": "Lenovo Store",
+    "distributor": "Lenovo India",
+    "warranty": "3 Years Legion Warranty"
   },
   {
     "slug": "asus-rog-strix-g16",
@@ -73,13 +131,33 @@
     "mrp": 159990,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "Asus ROG Strix G16",
+    "brand": "Asus",
+    "category": "Laptop",
+    "price": 119999,
+    "quantity": 11,
+    "description": "High performance gaming laptop",
+    "specifications": "Intel Core i9, 32GB RAM, RTX 4070, 1TB SSD, 16-inch 240Hz Display",
+    "seller": "ASUS Official Store",
+    "distributor": "ASUS India Pvt Ltd",
+    "warranty": "2 Years International Warranty"
   },
   {
     "slug": "samsung-galaxy-z-fold",
     "id": 11,
     "mrp": 189999,
-    "offers": []
+    "offers": [],
+    "name": "Samsung Galaxy Z Fold 8",
+    "brand": "Samsung",
+    "category": "Mobile",
+    "price": 174999,
+    "quantity": 6,
+    "description": "Premium foldable smartphone",
+    "specifications": "12GB RAM, 512GB Storage, Foldable AMOLED Display, Snapdragon Processor",
+    "seller": "Samsung Official Store",
+    "distributor": "Samsung Electronics India",
+    "warranty": "1 Year Manufacturer Warranty"
   },
   {
     "slug": "hp-omen-16",
@@ -87,7 +165,17 @@
     "mrp": 149999,
     "offers": [
       "clearance"
-    ]
+    ],
+    "name": "HP Omen 16",
+    "brand": "HP",
+    "category": "Laptop",
+    "price": 112000,
+    "quantity": 14,
+    "description": "Gaming laptop built for performance",
+    "specifications": "Ryzen 7, RTX 4060, 16GB RAM, 1TB SSD, 16-inch QHD Display",
+    "seller": "HP World",
+    "distributor": "HP India Sales Pvt Ltd",
+    "warranty": "3 Years HP Care Pack"
   },
   {
     "slug": "lenovo-thinkpad-x1-carbon",
@@ -95,12 +183,32 @@
     "mrp": 179999,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "Lenovo ThinkPad X1 Carbon",
+    "brand": "Lenovo",
+    "category": "Laptop",
+    "price": 138000,
+    "quantity": 10,
+    "description": "Business ultrabook for professionals",
+    "specifications": "Intel Core Ultra 7, 32GB RAM, 1TB SSD, Carbon Fiber Body",
+    "seller": "Lenovo Exclusive",
+    "distributor": "Lenovo India Pvt Ltd",
+    "warranty": "3 Years Onsite Warranty"
   },
   {
     "slug": "iphone-16-pro-max",
     "id": 14,
-    "offers": []
+    "offers": [],
+    "name": "iPhone 16 Pro Max",
+    "brand": "Apple",
+    "category": "Mobile",
+    "price": 159900,
+    "quantity": 8,
+    "description": "Apple premium flagship smartphone",
+    "specifications": "A18 Pro Chip, 256GB Storage, Titanium Design, 6.9-inch Display",
+    "seller": "Apple Official Store",
+    "distributor": "Apple India Pvt Ltd",
+    "warranty": "1 Year Apple Warranty"
   },
   {
     "slug": "google-pixel-10-pro",
@@ -108,7 +216,17 @@
     "mrp": 109999,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "Google Pixel 10 Pro",
+    "brand": "Google",
+    "category": "Mobile",
+    "price": 99999,
+    "quantity": 18,
+    "description": "Premium AI-powered flagship smartphone",
+    "specifications": "Tensor G5 Chip, 12GB RAM, 256GB Storage, AI Camera System, 120Hz OLED Display",
+    "seller": "Google Official Store",
+    "distributor": "Google India Pvt Ltd",
+    "warranty": "1 Year Manufacturer Warranty"
   },
   {
     "slug": "sony-wh-1000xm6",
@@ -116,13 +234,33 @@
     "mrp": 49990,
     "offers": [
       "festive"
-    ]
+    ],
+    "name": "Sony WH-1000XM6",
+    "brand": "Sony",
+    "category": "Electronics",
+    "price": 34999,
+    "quantity": 30,
+    "description": "Industry-leading wireless noise cancelling headphones",
+    "specifications": "Active Noise Cancellation, 40 Hours Battery, Bluetooth 5.4, Hi-Res Audio",
+    "seller": "Sony Official Store",
+    "distributor": "Sony India Pvt Ltd",
+    "warranty": "1 Year Manufacturer Warranty"
   },
   {
     "slug": "apple-ipad-pro-m4",
     "id": 17,
     "mrp": 139900,
-    "offers": []
+    "offers": [],
+    "name": "Apple iPad Pro M4",
+    "brand": "Apple",
+    "category": "Tablet",
+    "price": 129900,
+    "quantity": 14,
+    "description": "Professional-grade tablet powered by Apple M4 chip",
+    "specifications": "M4 Chip, 13-inch Ultra Retina XDR Display, 512GB Storage, Apple Pencil Pro Support",
+    "seller": "Apple Official Store",
+    "distributor": "Apple India Pvt Ltd",
+    "warranty": "1 Year Apple Warranty"
   },
   {
     "slug": "levis-511-jeans",

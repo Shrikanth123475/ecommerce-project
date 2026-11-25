@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.Security;
 
+import com.ecommerce.ecommerce.Repository.UserRepository;
 import com.ecommerce.ecommerce.Service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +22,7 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -50,17 +52,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .getContext()
                         .getAuthentication() == null) {
 
-            if (jwtService.validateToken(token, email)) {
+            // The account must still exist; its role decides what it may do (merchant vs customer).
+            var account = userRepository.findByEmail(email).orElse(null);
+
+            if (account != null && jwtService.validateToken(token, email)) {
+
+                var authorities = java.util.List.of(
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                "MERCHANT".equals(account.getRole()) ? "ROLE_MERCHANT" : "ROLE_CUSTOMER"));
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 new User(
                                         email,
                                         "",
-                                        Collections.emptyList()
+                                        authorities
                                 ),
                                 null,
-                                Collections.emptyList()
+                                authorities
                         );
 
                 authToken.setDetails(
