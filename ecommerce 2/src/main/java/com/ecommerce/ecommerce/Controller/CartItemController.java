@@ -33,7 +33,6 @@ public class CartItemController {
     public CartItem incrementQuantity(
             @PathVariable Long cartItemId,
             Principal principal){
-        System.out.println("Inside Increment Controller");
 
         return cartItemService.incrementQuantity(cartItemId,principal.getName());
     }

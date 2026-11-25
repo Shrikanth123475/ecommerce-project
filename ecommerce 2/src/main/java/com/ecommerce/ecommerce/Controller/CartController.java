@@ -23,11 +23,7 @@ public class CartController {
     public String addToCart(@RequestBody CartDTO cartDTO,Principal principal) {
 
 
-        System.out.println("Controller ProductId = "
-                + cartDTO.getProductId());
 
-        System.out.println("Controller Quantity = "
-                + cartDTO.getQuantity());
 
         cartService.addToCart(
                 principal.getName(),
@@ -42,16 +38,15 @@ public class CartController {
     @GetMapping()
     public CartResponseDTO getCart(Principal principal) {
          String email = principal.getName();
-        System.out.println(" email in cart get mapping  is  " + email);
 
         return cartService.getCartByEmail(email);
     }
 
     @DeleteMapping("/{cartItemId}")
     public String removeFromCart(
-            @PathVariable Long cartItemId) {
+            @PathVariable Long cartItemId, Principal principal) {
 
-        cartService.removeFromCart(cartItemId);
+        cartService.removeFromCart(cartItemId, principal.getName());
 
         return "Item removed successfully";
     }
