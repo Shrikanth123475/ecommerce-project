@@ -23,6 +23,12 @@ public class UserController {
     }
 
 
+    // Creates a merchant account. Allowed only for a logged-in merchant (SecurityConfig).
+    @PostMapping("/register-merchant")
+    public UserResponseDTO registerMerchant(@RequestBody UserDTO userDTO) {
+        return userService.registerMerchant(userDTO);
+    }
+
     @PostMapping("/login")
     public AuthResponseDTO login(@RequestBody LoginDTO loginDTO) {
         return userService.login(loginDTO);

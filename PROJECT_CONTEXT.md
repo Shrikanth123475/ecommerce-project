@@ -56,7 +56,7 @@ H2 allows **one process** on the file at a time: if DBeaver or an old backend ho
 - Login returns `AuthResponseDTO` (token + user). The JWT subject is the user's email.
 
 ### Endpoints
-**Users** `/api/users`: `POST /register`, `POST /login`, `GET /profile`, `PUT /profile`, `DELETE /delete`
+**Users** `/api/users`: `POST /register` (always a customer), `POST /register-merchant` (merchant token required), `POST /login`, `GET /profile`, `PUT /profile`, `DELETE /delete`
 **Products** `/api/products` (public): `GET /` (search/category/brand/sort), `GET /categories`, `GET /brands`, `GET /filter`, `GET /{id}`, plus `POST`, `PUT /{id}`, `DELETE /{id}` for admin-style management
 **Cart** `/api/cart`: `GET /` (current user's cart), `POST /add` (productId, quantity, optional size), `DELETE /{cartItemId}`
 **Cart items** `/api/cart-items`: `PUT /{id}/increment`, `PUT /{id}/decrement`, `DELETE /{id}`

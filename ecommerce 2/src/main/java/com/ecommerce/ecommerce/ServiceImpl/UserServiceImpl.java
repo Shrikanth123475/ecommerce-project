@@ -37,6 +37,16 @@ public UserServiceImpl (
 
 @Override
     public UserResponseDTO register(UserDTO userDTO){
+    return createUser(userDTO, null);   // normal sign-up is always a customer
+}
+
+// Only reachable by an existing merchant (see SecurityConfig).
+@Override
+    public UserResponseDTO registerMerchant(UserDTO userDTO){
+    return createUser(userDTO, "MERCHANT");
+}
+
+private UserResponseDTO createUser(UserDTO userDTO, String role){
     if(userRepository.existsByEmail(userDTO.getEmail())){
         throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
@@ -57,6 +67,7 @@ public UserServiceImpl (
     user.setEmail(userDTO.getEmail());
     user.setPassword(passwordEncoder.encode(password));
     user.setAddress(userDTO.getAddress());
+    user.setRole(role);
 
     User savedUser = userRepository.save(user);
 
